@@ -4,10 +4,13 @@ import akka.actor.{Props, ActorRef, Actor}
 import akka.routing.RoundRobinRouter
 
 class DataImportMaster(nrOfWorkers: Int) extends Actor {
-  val workerRouter = context.actorOf(Props[DataImportWorker].withRouter(RoundRobinRouter(nrOfWorkers)), name = "workerRouter")
+  val sysLogRouter = context.actorOf(Props[SysLogImportWorker].withRouter(RoundRobinRouter(nrOfWorkers)), name = "sysLogRouter")
 
   def receive = {
-    case TriggerDataImport => println("triggered!")
-
+    case TriggerDataImport => sysLogRouter ! SysLogImport
+    case SysLogResult => {
+      println("syslog imported")
+      context.stop(self)
+    }
   }
 }
