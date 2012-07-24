@@ -7,7 +7,8 @@ import play.api.Play.current
 object DataImportManager {
 
   def schedule() {
-    val myActor = Akka.system.actorOf(Props[DataImportMaster], name = "dataimport")
+    val importMaster = Akka.system.actorOf(Props(new DataImportMaster(2)), name = "dataimport")
 
+    importMaster ! TriggerDataImport
   }
 }
