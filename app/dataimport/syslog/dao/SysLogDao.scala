@@ -1,33 +1,25 @@
 package dataimport.syslog.dao
 
-import nl.tecon.ucm.domain.{Cdr, SysLog}
-import org.mybatis.scala.mapping._
-import org.joda.time.DateTime
-import nl.tecon.ucm.domain.Cdr
-import nl.tecon.ucm.domain.SysLog
-
+import play.api.db._
+import play.api.Play.current
+import anorm._
+import anorm.SqlParser._
 
 object SysLogDao {
-  val SysLogResultMap = new ResultMap[SysLog] {
-    id(column = "ID", property = "id")
-    arg(column = "ID", javaType = T[Long])
-    arg(column = "DeviceReportedTime", javaType = T[DateTime])
-    arg(column = "Facility", javaType = T[Int])
-    arg(column = "Priority", javaType = T[Int])
-    arg(column = "FromHost", javaType = T[String])
-    arg(column = "Message", javaType = T[String])
+  def findAfterId(id: Long): List[(Int, String)] = {
+    DB.withConnection {
+      implicit c =>
+        val query = """SELECT ID, Message
+                      |FROM SystemEvents
+                      |WHERE ID >= {id}
+                      |AND Priority = 5
+                      |AND Facility = 5
+                    """
+
+        SQL(query)
+          .on('id -> id)
+          .as(int("ID") ~ str("Message") *)
+          .map(flatten)
+    }
   }
-
-  val findAfterId = new SelectListBy[Long, SysLog] {
-    resultMap = SysLogResultMap
-
-    def xsql = <xsql>
-      SELECT *
-      FROM SystemEvents
-      WHERE ID >= #{{id}} AND Priority = 5
-      AND Facility = 5
-    </xsql>
-  }
-
-  def bind = Seq(findAfterId)
 }

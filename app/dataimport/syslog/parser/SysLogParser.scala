@@ -1,16 +1,11 @@
 package dataimport.syslog.parser
 
-import nl.tecon.ucm.domain.{CdrVsa, Cdr, SysLog}
-import nl.tecon.ucm.dataimport.syslog.SysLogParsingStatistics
-import nl.tecon.ucm.dataimport.syslog.dao.{CdrVsaDao, CdrDao, SysLogDao}
-import org.mybatis.scala.session.Session
-import org.apache.log4j.Logger
 import domain.{CdrVsa, Cdr, SysLog}
 import dataimport.syslog.SysLogParsingStatistics
 
 object SysLogParser {
-  def parse(syslog: SysLog)(implicit stats: SysLogParsingStatistics) {
-    val rawCdr = RawCdr(syslog.message)
+  def parse(syslog: String)(implicit stats: SysLogParsingStatistics) {
+    val rawCdr = RawCdr(syslog)
 
     rawCdr.cdrType() match {
       case Some(cdrType) if (cdrType.contains("VOIP_CALL_HISTORY")) => persist(cdrHistoryParser(rawCdr))
