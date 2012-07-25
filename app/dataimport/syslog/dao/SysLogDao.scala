@@ -6,19 +6,19 @@ import anorm._
 import anorm.SqlParser._
 
 object SysLogDao {
-  def findAfterId(id: Long): List[(Int, String)] = {
+  def findAfterId(id: Long): List[(Long, String)] = {
     DB.withConnection {
       implicit c =>
         val query = """SELECT ID, Message
-                      |FROM SystemEvents
-                      |WHERE ID >= {id}
-                      |AND Priority = 5
-                      |AND Facility = 5
+                      FROM SystemEvents
+                      WHERE ID >= {id}
+                      AND Priority = 5
+                      AND Facility = 5
                     """
 
         SQL(query)
           .on('id -> id)
-          .as(int("ID") ~ str("Message") *)
+          .as(long("ID") ~ str("Message") *)
           .map(flatten)
     }
   }

@@ -4,15 +4,15 @@ import dao.SysLogDao
 import org.springframework.stereotype.Service
 import parser.SysLogParser
 
-trait SysLogImport {
+trait SysLogImporter {
   def parseSysLog(): SysLogParsingStatistics
 }
 
 @Service
-class SysLogImportImpl extends SysLogImport {
+class SysLogImporterImpl extends SysLogImporter {
   def parseSysLog(): SysLogParsingStatistics = {
     implicit val stats = new SysLogParsingStatistics()
-        SysLogDao.findAfterId(0) map (x => SysLogParser.parse(x._2))
+        SysLogDao.findAfterId(0) map (x => println(x._2))
 
     stats
   }
