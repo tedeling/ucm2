@@ -5,7 +5,7 @@ import play.api.modules.spring.Spring
 import syslog.{SysLogImporter}
 
 class SysLogImportWorker extends Actor {
-  val x = Spring.getBeanOfType(classOf[SysLogImporter])
+  val x:SysLogImporter = Spring.getBeanOfType(classOf[SysLogImporter])
 
 
   protected def receive =  {

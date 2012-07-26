@@ -11,15 +11,18 @@ object SysLogDao {
       implicit c =>
         val query = """SELECT ID, Message
                       FROM SystemEvents
-                      WHERE ID >= {id}
+                      WHERE ID >= {id} AND ID <= 20000
                       AND Priority = 5
                       AND Facility = 5
                     """
 
-        SQL(query)
+        println("starting query")
+        val x = SQL(query)
           .on('id -> id)
           .as(long("ID") ~ str("Message") *)
           .map(flatten)
+        println("ending query")
+        x
     }
   }
 }

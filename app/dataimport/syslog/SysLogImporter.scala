@@ -12,8 +12,7 @@ trait SysLogImporter {
 class SysLogImporterImpl extends SysLogImporter {
   def parseSysLog(): SysLogParsingStatistics = {
     implicit val stats = new SysLogParsingStatistics()
-        SysLogDao.findAfterId(0) map (x => println(x._2))
-
+        SysLogDao.findAfterId(0) //map (x => println(x._2))
     stats
   }
 }
