@@ -1,0 +1,6 @@
+package dataimport
+
+sealed trait DataImportMessage
+case object TriggerDataImport extends DataImportMessage
+case object SysLogImport extends DataImportMessage
+case object SysLogResult extends DataImportMessage
