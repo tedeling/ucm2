@@ -13,7 +13,6 @@ class DataImportMaster(nrOfWorkers: Int) extends Actor {
     }
     case SysLogResult => {
       println("syslog imported")
-      context.stop(self)
     }
   }
 }
