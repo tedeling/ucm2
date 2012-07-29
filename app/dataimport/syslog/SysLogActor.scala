@@ -10,11 +10,8 @@ import dataimport.ActorUtil._
 import akka.routing.RoundRobinRouter
 
 sealed trait SysLogMessage
-
 case object SysLogMessagesFetch extends SysLogMessage
-
 case class SysLogMessagesResult(sysLogEntries: List[(Long, String)]) extends SysLogMessage
-
 case class SysLogParse(rawSysLogEntry: String) extends SysLogMessage
 
 class SysLogImportWorker extends Actor {

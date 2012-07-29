@@ -19,6 +19,5 @@ object ImportController extends Controller {
     val status: DataImportStatus = DataImportManager.status()
 
     Ok(views.html.status_page(if (status.finished) { "finished" } else if (status.started) { "started" } else { "idle"}))
-
   }
 }

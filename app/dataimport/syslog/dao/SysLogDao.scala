@@ -11,7 +11,7 @@ object SysLogDao {
       implicit c =>
         val query = """SELECT ID, Message
                       FROM SystemEvents
-                      WHERE ID >= {id} AND ID <= 20000
+                      WHERE ID >= {id}/* AND ID <= 20000*/
                       AND Priority = 5
                       AND Facility = 5
                     """
