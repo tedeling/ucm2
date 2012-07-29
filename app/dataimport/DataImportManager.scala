@@ -1,12 +1,11 @@
 package dataimport
 
-import akka.actor.{ActorRef, InvalidActorNameException, Props}
-import play.api.libs.concurrent.Akka
-import play.api.Play.current
+import akka.actor.ActorRef
 import akka.dispatch.Await
 import akka.pattern.ask
 import akka.util.Timeout
 import akka.util.duration._
+import ActorUtil._
 
 object DataImportManager {
 
@@ -14,21 +13,17 @@ object DataImportManager {
 
   def status(): DataImportStatus = {
     implicit val timeout = Timeout(5 seconds)
-    val future = findDataImportMaster() ? Status
+    val future = findOrCreateDataImport ? Status
     Await.result(future, 1 second).asInstanceOf[DataImportStatus]
   }
 
   def schedule() {
-    findDataImportMaster() ! TriggerDataImport
+    findOrCreateDataImport ! TriggerDataImport
   }
 
-  def findDataImportMaster(): ActorRef = {
-    try {
-      Akka.system.actorOf(Props(new DataImportMaster(1)), name = DataImportName)
-    } catch {
-      case e: InvalidActorNameException => actorReference
+  def findOrCreateDataImport: ActorRef = {
+    findOrCreateActor(DataImportName) {
+      new DataImportMaster(1)
     }
   }
-
-  def actorReference = Akka.system.actorFor("/user/" + DataImportName)
 }

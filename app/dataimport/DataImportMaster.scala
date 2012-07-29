@@ -3,8 +3,10 @@ package dataimport
 import akka.actor.{ActorPath, Props, ActorRef, Actor}
 import akka.routing.RoundRobinRouter
 import org.joda.time.{LocalDateTime, DateTime}
+import syslog.SysLogImportWorker
 
 class DataImportMaster(nrOfWorkers: Int) extends Actor {
+
   val sysLogRouter = context.actorOf(Props[SysLogImportWorker].withRouter(RoundRobinRouter(nrOfWorkers)), name = "sysLogRouter")
 
   var status: DataImportStatus = DataImportStatus()

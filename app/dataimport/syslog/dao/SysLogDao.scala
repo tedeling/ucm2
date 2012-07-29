@@ -16,13 +16,10 @@ object SysLogDao {
                       AND Facility = 5
                     """
 
-        println("starting query")
-        val x = SQL(query)
+        SQL(query)
           .on('id -> id)
           .as(long("ID") ~ str("Message") *)
           .map(flatten)
-        println("ending query")
-        x
     }
   }
 }

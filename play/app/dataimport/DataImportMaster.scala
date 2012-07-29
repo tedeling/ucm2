@@ -2,6 +2,7 @@ package dataimport
 
 import akka.actor.{ActorPath, Props, ActorRef, Actor}
 import akka.routing.RoundRobinRouter
+import syslog.SysLogImportWorker
 
 class DataImportMaster(nrOfWorkers: Int) extends Actor {
   val sysLogRouter = context.actorOf(Props[SysLogImportWorker].withRouter(RoundRobinRouter(nrOfWorkers)), name = "sysLogRouter")

@@ -1,0 +1,5 @@
+package dataimport
+
+class SysLogMessage {
+
+}
