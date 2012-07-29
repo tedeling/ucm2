@@ -18,7 +18,7 @@ class CdrBuilder(val rawCdr: String) extends BuilderMap(separator = " ") {
       None
     } else if (cdr("connectionid") == InvalidConnectionId) {
       stats.addWarning()
-      Logger.warn("Discarding connectionId: 0000. CDR: %s".format(rawCdr))
+//      Logger.warn("Discarding connectionId: 0000. CDR: %s".format(rawCdr))
       None
     } else {
       val someCdr = Some(Cdr(connectionId = cdr("connectionid"),
