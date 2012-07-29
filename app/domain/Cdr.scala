@@ -80,10 +80,13 @@ object ForwardingReason extends Enum[ForwardingReason] {
   }
 
   def forRawValue(rawValue: String) = {
-    values.find(_.rawValue == rawValue).get
+    values.find(_.rawValue == rawValue) match {
+      case Some(reason) => reason
+      case None =>  { println("Unknown value: " + rawValue);UNKNOWN}
+    }
   }
 
-  val values = List(UNKNOWN, CALL_FWD, CALL_FWD_BUSY, CALL_DEFLECTION)
+  val values = List(UNKNOWN, CALL_FWD, CALL_FWD_BUSY, CALL_FWD_NO_REPLY, CALL_DEFLECTION)
 }
 
 abstract class AbstractCdr(connectionId: String)
