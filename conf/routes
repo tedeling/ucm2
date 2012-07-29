@@ -9,5 +9,8 @@ GET     /import                     controllers.dataimport.ImportController.inde
 
 GET     /trigger_import             controllers.dataimport.ImportController.triggerImport
 
+GET     /status                     controllers.dataimport.ImportController.status
+
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
