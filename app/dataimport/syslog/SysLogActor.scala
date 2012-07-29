@@ -8,9 +8,7 @@ import play.api.Logger
 import dataimport.ActorUtil._
 
 sealed trait SysLogMessage
-
 case object SysLogMessagesFetch extends SysLogMessage
-
 case class SysLogMessagesResult(sysLogEntries: List[(Long, String)]) extends SysLogMessage
 
 
@@ -23,8 +21,8 @@ class SysLogImportWorker extends Actor {
       } ! SysLogMessagesFetch
     }
 
-    case SysLogMessagesFetch => {
-      Logger.info("And it's finished")
+    case SysLogMessagesResult(value) => {
+      Logger.info("Received %d syslog events".format(value.size))
 
     }
   }
