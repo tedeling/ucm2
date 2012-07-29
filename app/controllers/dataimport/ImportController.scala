@@ -5,7 +5,9 @@ import dataimport.{DataImportStatus, DataImportManager}
 
 object ImportController extends Controller {
   def index = Action {
-    Ok(views.html.dataimport())
+    val status: DataImportStatus = DataImportManager.status()
+
+    Ok(views.html.status_page(if (status.finished) { "finished" } else if (status.started) { "started" } else { "idle"}))
   }
 
   def triggerImport = Action {
