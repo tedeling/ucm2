@@ -8,10 +8,18 @@ import parser.SysLogParser
 import play.api.Logger
 import dataimport.ActorUtil._
 import akka.routing.RoundRobinRouter
+import domain.{AbstractCdr, CdrVsa, Cdr}
 
 sealed trait SysLogMessage
+
 case object SysLogMessagesFetch extends SysLogMessage
+
+case class SysLogMessagesPersistCdr(cdr: Cdr) extends SysLogMessage
+
+case class SysLogMessagesPersistCdrVsa(cdrVsa: CdrVsa) extends SysLogMessage
+
 case class SysLogMessagesResult(sysLogEntries: List[(Long, String)]) extends SysLogMessage
+
 case class SysLogParse(rawSysLogEntry: String) extends SysLogMessage
 
 class SysLogImportWorker extends Actor {
@@ -22,7 +30,7 @@ class SysLogImportWorker extends Actor {
   protected def receive = {
     case SysLogImport => {
       findOrCreateActor("sysLogDao") {
-        new SysLogDaoWorker()
+        new SysLogMessageFetchWorker()
       } ! SysLogMessagesFetch
     }
 
@@ -35,17 +43,27 @@ class SysLogImportWorker extends Actor {
 }
 
 class SysLogParseWorker extends Actor {
+  val sysLogRouter = context.actorOf(Props[SysLogParseWorker].withRouter(RoundRobinRouter(10)), name = "sysLogParseRouter")
+
   protected def receive = {
     case SysLogParse(entry) => {
       implicit val stats: SysLogParsingStatistics = new SysLogParsingStatistics()
 
-      SysLogParser.parse(entry)
+      val parsed: Option[AbstractCdr] = SysLogParser.parse(entry)
+
+
+      parsed match {
+        case None => println("failed")
+        case Some(x) => x match {
+          case x: Cdr => println("cdr: " + x.connectionId)
+          case x: CdrVsa => println("vsa: " + x.connectionId)
+        }
+      }
     }
   }
 }
 
-
-class SysLogDaoWorker extends Actor {
+class SysLogMessagePersistWorker extends Actor {
   protected def receive = {
     case SysLogMessagesFetch =>
       Logger.info("Fetching syslog dao")
@@ -54,3 +72,16 @@ class SysLogDaoWorker extends Actor {
       sender ! SysLogMessagesResult(sysLogEntries)
   }
 }
+
+class SysLogMessageFetchWorker extends Actor {
+  protected def receive = {
+    case SysLogMessagesFetch =>
+      Logger.info("Fetching syslog dao")
+      val sysLogEntries: List[(Long, String)] = SysLogDao.findAfterId(0)
+
+      sender ! SysLogMessagesResult(sysLogEntries)
+  }
+}
+
+
+
