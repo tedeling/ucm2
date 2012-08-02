@@ -23,7 +23,7 @@ case class SysLogMessagesResult(sysLogEntries: List[(Long, String)]) extends Sys
 case class SysLogParse(rawSysLogEntry: String) extends SysLogMessage
 
 class SysLogImportWorker extends Actor {
-  val NrOfParsingActors = 8
+  val NrOfParsingActors = 4
 
   val sysLogRouter = context.actorOf(Props[SysLogParseWorker].withRouter(RoundRobinRouter(NrOfParsingActors)), name = "sysLogParseRouter")
 
@@ -43,7 +43,7 @@ class SysLogImportWorker extends Actor {
 }
 
 class SysLogParseWorker extends Actor {
-  val sysLogRouter = context.actorOf(Props[SysLogParseWorker].withRouter(RoundRobinRouter(10)), name = "sysLogParseRouter")
+  val persistRouter = context.actorOf(Props[SysLogMessagePersistWorker].withRouter(RoundRobinRouter(4)), name = "sysLogPersistRouter")
 
   protected def receive = {
     case SysLogParse(entry) => {
@@ -51,13 +51,12 @@ class SysLogParseWorker extends Actor {
 
       val parsed: Option[AbstractCdr] = SysLogParser.parse(entry)
 
-
       parsed match {
-        case None => println("failed")
         case Some(x) => x match {
-          case x: Cdr => println("cdr: " + x.connectionId)
-          case x: CdrVsa => println("vsa: " + x.connectionId)
+          case cdr: Cdr => persistRouter ! SysLogMessagesPersistCdr(cdr)
+          case vsa: CdrVsa => persistRouter ! SysLogMessagesPersistCdrVsa(vsa)
         }
+        case None =>
       }
     }
   }
@@ -65,11 +64,16 @@ class SysLogParseWorker extends Actor {
 
 class SysLogMessagePersistWorker extends Actor {
   protected def receive = {
-    case SysLogMessagesFetch =>
-      Logger.info("Fetching syslog dao")
-      val sysLogEntries: List[(Long, String)] = SysLogDao.findAfterId(0)
+    case message: SysLogMessagesPersistCdr => {
+      Logger.info("Persisting cdr")
 
-      sender ! SysLogMessagesResult(sysLogEntries)
+      SysLogDao.persistCdr(message.cdr)
+    }
+
+    case SysLogMessagesPersistCdrVsa => {
+      Logger.info("persisting vsa")
+    }
+
   }
 }
 

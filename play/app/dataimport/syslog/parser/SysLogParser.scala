@@ -20,7 +20,7 @@ object SysLogParser {
 //        val record = CdrDao.findByOriginalRecord(c.originalRecord)
 //
 //        if (record.isEmpty)
-//          CdrDao.persist(c)
+//          CdrDao.persistCdr(c)
 //        else
 //          LOG.warn("Record already exists %s".format(c.originalRecord))
 //      }
@@ -34,7 +34,7 @@ object SysLogParser {
 //        val record = CdrDao.findByOriginalRecord(c.originalRecord)
 //
 //        if (record.isEmpty)
-//          CdrVsaDao.persist(c)
+//          CdrVsaDao.persistCdr(c)
 //        else
 //          LOG.warn("Record already exists %s".format(c.originalRecord))
 //      }

@@ -25,7 +25,7 @@ object SysLogDao {
     }
   }
 
-  def persist(cdr: Cdr)  {
+  def persistCdr(cdr: Cdr)  {
     DB.withConnection { conn =>
       val stmt: PreparedStatement = conn.prepareStatement( """INSERT INTO CDR (CALL_LEG_TYPE, CONNECTION_ID, SETUP_TIME,
                                                       PEER_ADDRESS, PEER_SUB_ADDRESS,
