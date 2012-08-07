@@ -18,7 +18,7 @@ case class SysLogMessagesPersistCdrVsa(cdrVsa: CdrVsa) extends SysLogMessage
 case class SysLogMessagesResult(sysLogEntries: List[(Long, String)]) extends SysLogMessage
 case class SysLogParse(rawSysLogEntry: String) extends SysLogMessage
 
-class SysLogImportWorker extends Actor {
+class SysLogImportMaster extends Actor {
   val NrOfParsingActors = 4
 
   val sysLogRouter = context.actorOf(Props[SysLogParseWorker].withRouter(RoundRobinRouter(NrOfParsingActors)), name = "sysLogParseRouter")
@@ -60,10 +60,18 @@ class SysLogMessagePersistWorker extends Actor {
   protected def receive = {
 
     case message: SysLogMessagesPersistCdrVsa => {
-      SysLogDao.persistCdrVsa(message.cdrVsa)
+      if (SysLogDao.vsaExists(message.cdrVsa.originalRecord)) {
+        Logger.info("vsa exists")
+      } else {
+        SysLogDao.persistCdrVsa(message.cdrVsa)
+      }
     }
     case message: SysLogMessagesPersistCdr => {
-      SysLogDao.persistCdr(message.cdr)
+      if (SysLogDao.cdrExists(message.cdr.originalRecord)) {
+        Logger.info("cdr exists")
+      } else {
+        SysLogDao.persistCdr(message.cdr)
+      }
     }
   }
 }
