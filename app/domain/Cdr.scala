@@ -3,49 +3,32 @@ package domain
 import org.joda.time.{LocalDateTime, DateTime}
 
 trait Enum[A] {
-
   trait Value {
     self: A =>
   }
 
   val values: List[A]
-
   def exists(name: String) = values.find(e => e.toString == name).isDefined
-
   def withName(name: String) = (values.find(e => e.toString == name)).get
 }
 
 sealed trait FeatureName extends FeatureName.Value
-
 object FeatureName extends Enum[FeatureName] {
-
   case object CFA extends FeatureName
-
   case object CFBY extends FeatureName
-
   case object CFNA extends FeatureName
-
   case object BXFER extends FeatureName
-
   case object CXFER extends FeatureName
-
   case object HOLD extends FeatureName
-
   case object RESUME extends FeatureName
-
   case object TWC extends FeatureName
-
   val values = List(CFA, CFBY, CFNA, BXFER, CXFER, HOLD, RESUME, TWC)
 }
 
 sealed trait FeatureStatus extends FeatureStatus.Value
-
 object FeatureStatus extends Enum[FeatureStatus] {
-
   case object SUCCESS extends FeatureStatus
-
   case object FAIL extends FeatureStatus
-
   val values = List(SUCCESS, FAIL)
 }
 

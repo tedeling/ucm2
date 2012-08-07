@@ -60,7 +60,7 @@ class SysLogMessagePersistWorker extends Actor {
   protected def receive = {
 
     case message: SysLogMessagesPersistCdrVsa => {
-      Logger.info("persisting vsa")
+      SysLogDao.persistCdrVsa(message.cdrVsa)
     }
     case message: SysLogMessagesPersistCdr => {
       SysLogDao.persistCdr(message.cdr)

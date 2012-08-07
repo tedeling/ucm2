@@ -4,7 +4,7 @@ import play.api.db._
 import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
-import domain.Cdr
+import domain.{CdrVsa, Cdr}
 import java.sql.{Timestamp, PreparedStatement}
 
 object SysLogDao {
@@ -27,7 +27,7 @@ object SysLogDao {
 
   def persistCdr(cdr: Cdr)  {
     DB.withConnection { conn =>
-      val stmt: PreparedStatement = conn.prepareStatement( """INSERT INTO CDR (CALL_LEG_TYPE, CONNECTION_ID, SETUP_TIME,
+      val stmt = conn.prepareStatement( """INSERT INTO CDR (CALL_LEG_TYPE, CONNECTION_ID, SETUP_TIME,
                                                       PEER_ADDRESS, PEER_SUB_ADDRESS,
                                                       DISCONNECT_CAUSE, DISCONNECT_TEXT,
                                                       CONNECT_TIME, DISCONNECT_TIME,
@@ -55,6 +55,36 @@ object SysLogDao {
       stmt.setLong(15, cdr.receivedPackets)
       stmt.setLong(16, cdr.receivedBytes)
       stmt.setString(17, cdr.originalRecord)
+
+      stmt.execute()
+
+    }
+  }
+
+  def persistCdrVsa(vsa: CdrVsa)  {
+    DB.withConnection { conn =>
+      val stmt = conn.prepareStatement( """INSERT INTO CDR_VSA (FEATURE_ID, CONNECTION_ID,
+                                           FEATURE_NAME, FWD_FROM_NUMBER, STATUS, FEATURE_TIME,
+                                           FWD_REASON, FWD_NUMBER, FWD_SRC_NUMBER, FWD_TO_NUMBER,
+                                           CALLED_NUMBER, CALLING_NUMBER,
+                                           LEG_ID, ORIGINAL_RECORD)
+                                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""")
+
+
+      stmt.setLong(1, vsa.featureId)
+      stmt.setString(2, vsa.connectionId)
+      stmt.setString(3, vsa.name.toString)
+      stmt.setString(4, vsa.forwardFromNumber)
+      stmt.setString(5, vsa.status.toString)
+      stmt.setTimestamp(6, new Timestamp(vsa.featureTime.toDate.getTime))
+      stmt.setString(7, vsa.forwardingReason.toString)
+      stmt.setString(8, vsa.forwardedNumber)
+      stmt.setString(9, vsa.forwardSourceNumber)
+      stmt.setString(10, vsa.forwardToNumber)
+      stmt.setString(11, vsa.calledNumber)
+      stmt.setString(12, vsa.callingNumber)
+      stmt.setString(13, vsa.legId)
+      stmt.setString(14, vsa.originalRecord)
 
       stmt.execute()
 
