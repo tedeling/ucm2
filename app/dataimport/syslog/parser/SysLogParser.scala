@@ -14,34 +14,6 @@ object SysLogParser {
     }
   }
 
-  def persist(cdr: Option[Cdr]) {
-//    cdr match {
-//      case Some(c) => {
-//        val record = CdrDao.findByOriginalRecord(c.originalRecord)
-//
-//        if (record.isEmpty)
-//          CdrDao.persist(c)
-//        else
-//          LOG.warn("Record already exists %s".format(c.originalRecord))
-//      }
-//      case None =>
-//    }
-  }
-
-  def persistVsa(cdr: Option[CdrVsa]) {
-//    cdr match {
-//      case Some(c) => {
-//        val record = CdrDao.findByOriginalRecord(c.originalRecord)
-//
-//        if (record.isEmpty)
-//          CdrVsaDao.persist(c)
-//        else
-//          LOG.warn("Record already exists %s".format(c.originalRecord))
-//      }
-//      case None =>
-//    }
-  }
-
   def cdrHistoryParser(rawCdr: RawCdr)(implicit stats: SysLogParsingStatistics): Option[Cdr] = {
 
     val builder = new CdrBuilder(rawCdr.cdr)

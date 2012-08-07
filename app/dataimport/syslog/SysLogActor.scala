@@ -13,13 +13,9 @@ import domain.{AbstractCdr, CdrVsa, Cdr}
 sealed trait SysLogMessage
 
 case object SysLogMessagesFetch extends SysLogMessage
-
 case class SysLogMessagesPersistCdr(cdr: Cdr) extends SysLogMessage
-
 case class SysLogMessagesPersistCdrVsa(cdrVsa: CdrVsa) extends SysLogMessage
-
 case class SysLogMessagesResult(sysLogEntries: List[(Long, String)]) extends SysLogMessage
-
 case class SysLogParse(rawSysLogEntry: String) extends SysLogMessage
 
 class SysLogImportWorker extends Actor {
@@ -49,9 +45,7 @@ class SysLogParseWorker extends Actor {
     case SysLogParse(entry) => {
       implicit val stats: SysLogParsingStatistics = new SysLogParsingStatistics()
 
-      val parsed: Option[AbstractCdr] = SysLogParser.parse(entry)
-
-      parsed match {
+      SysLogParser.parse(entry) match {
         case Some(x) => x match {
           case cdr: Cdr => persistRouter ! SysLogMessagesPersistCdr(cdr)
           case vsa: CdrVsa => persistRouter ! SysLogMessagesPersistCdrVsa(vsa)
@@ -64,16 +58,13 @@ class SysLogParseWorker extends Actor {
 
 class SysLogMessagePersistWorker extends Actor {
   protected def receive = {
-    case message: SysLogMessagesPersistCdr => {
-      Logger.info("Persisting cdr")
 
-      SysLogDao.persistCdr(message.cdr)
-    }
-
-    case SysLogMessagesPersistCdrVsa => {
+    case message: SysLogMessagesPersistCdrVsa => {
       Logger.info("persisting vsa")
     }
-
+    case message: SysLogMessagesPersistCdr => {
+      SysLogDao.persistCdr(message.cdr)
+    }
   }
 }
 
