@@ -8,14 +8,19 @@ import parser.SysLogParser
 import play.api.Logger
 import dataimport.ActorUtil._
 import akka.routing.RoundRobinRouter
-import domain.{AbstractCdr, CdrVsa, Cdr}
+import domain.{CdrVsa, Cdr}
+import play.api.db.DB
 
 sealed trait SysLogMessage
 
 case object SysLogMessagesFetch extends SysLogMessage
+
 case class SysLogMessagesPersistCdr(cdr: Cdr) extends SysLogMessage
+
 case class SysLogMessagesPersistCdrVsa(cdrVsa: CdrVsa) extends SysLogMessage
+
 case class SysLogMessagesResult(sysLogEntries: List[(Long, String)]) extends SysLogMessage
+
 case class SysLogParse(rawSysLogEntry: String) extends SysLogMessage
 
 class SysLogImportMaster extends Actor {
@@ -57,20 +62,33 @@ class SysLogParseWorker extends Actor {
 }
 
 class SysLogMessagePersistWorker extends Actor {
-  protected def receive = {
+  import play.api.Play.current
 
-    case message: SysLogMessagesPersistCdrVsa => {
-      if (SysLogDao.vsaExists(message.cdrVsa.originalRecord)) {
-        Logger.info("vsa exists")
-      } else {
-        SysLogDao.persistCdrVsa(message.cdrVsa)
+  protected def receive = {
+    case message: SysLogMessagesPersistCdrVsa => persistVsa(message.cdrVsa)
+    case message: SysLogMessagesPersistCdr =>  persistCdr(message.cdr)
+  }
+
+  def persistVsa(vsa: CdrVsa) {
+    DB.withConnection {
+      implicit c => {
+        if (SysLogDao.vsaExists(vsa.originalRecord)) {
+          Logger.info("vsa exists")
+        } else {
+          SysLogDao.persistCdrVsa(vsa)
+        }
       }
     }
-    case message: SysLogMessagesPersistCdr => {
-      if (SysLogDao.cdrExists(message.cdr.originalRecord)) {
-        Logger.info("cdr exists")
-      } else {
-        SysLogDao.persistCdr(message.cdr)
+  }
+
+  def persistCdr(cdr: Cdr) {
+    DB.withConnection {
+      implicit c => {
+        if (SysLogDao.cdrExists(cdr.originalRecord)) {
+          Logger.info("cdr exists")
+        } else {
+          SysLogDao.persistCdr(cdr)
+        }
       }
     }
   }
