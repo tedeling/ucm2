@@ -7,7 +7,7 @@ GET     /                           controllers.Application.index
 
 GET     /import                     controllers.dataimport.ImportController.index
 
-GET     /trigger_import             controllers.dataimport.ImportController.triggerImport
+GET     /import/trigger             controllers.dataimport.ImportController.triggerImport
 
 GET     /status                     controllers.dataimport.ImportController.status
 

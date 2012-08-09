@@ -5,25 +5,26 @@
     <div class="span8">
         <h2>Trigger</h2>
         Trigger an immediate data import of CDR and ACD data from your router.
-        <br />
+        <br/>
         When an import is currently running this trigger will be ignored.
-        <br />
-        <br />
+        <br/>
+        <br/>
 
-        <a class="btn btn-primary" href="http://localhost:9000/trigger_import">
+        <button class="btn btn-primary" id="trigger_import">
             <i class="icon-refresh"></i>
-            Trigger import</a>
+            Trigger import
+        </button>
 
-        <br />
-        <br />
-        <br />
+        <br/>
+        <br/>
+        <br/>
 
         <h2>Configure</h2>
         Configure the stuff here
-        <br />
+        <br/>
         When an import is currently running this trigger will be ignored.
-        <br />
-        <br />
+        <br/>
+        <br/>
 
         <a class="btn btn-primary" href="http://localhost:9000/trigger_import">
             <i class="icon-wrench"></i>
@@ -31,75 +32,89 @@
     </div>
 
     <div class="span4">
-            <h2>Status</h2>
-            <div class="well">
-                <div class="row">
-                    <table style="margin-left:20px">
-                        <tbody>
-                        <tr>
-                            <td>Currently:</td>
-                            <td>idle</td>
-                        </tr>
+        <h2>Status</h2>
 
-                        <tr>
-                            <td>Last run:</td>
-                            <td>2012-08-09 23:20</td>
-                        </tr>
+        <div class="well">
+            <div class="row">
+                <table style="margin-left:20px">
+                    <tbody>
+                    <tr>
+                        <td>Currently:</td>
+                        <td>idle</td>
+                    </tr>
 
-                        <tr>
-                            <td>CDR's found:</td>
-                            <td>3000</td>
-                        </tr>
+                    <tr>
+                        <td>Last run:</td>
+                        <td>2012-08-09 23:20</td>
+                    </tr>
 
-                        <tr>
-                            <td>VSA's found:</td>
-                            <td>4000</td>
-                        </tr>
+                    <tr>
+                        <td>CDR's found:</td>
+                        <td>3000</td>
+                    </tr>
 
-                        <tr>
-                            <td>Duplicates:</td>
-                            <td>2000</td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                    <tr>
+                        <td>VSA's found:</td>
+                        <td>4000</td>
+                    </tr>
+
+                    <tr>
+                        <td>Duplicates:</td>
+                        <td>2000</td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
+        </div>
 
-        <br />
+        <br/>
 
-            <h2>Statistics</h2>
-            <div class="well">
-                <div class="row">
-                    <div style="float:right"><i class="icon-refresh"></i></div>
-                    <table style="margin-left:20px">
-                        <tbody>
-                        <tr>
-                            <td>CDR in db:</td>
-                            <td>3000</td>
-                        </tr>
+        <h2>Statistics</h2>
 
-                        <tr>
-                            <td>VSA in db:</td>
-                            <td>6000</td>
-                        </tr>
-                        </tbody>
-                    </table>
+        <div class="well">
+            <div class="row">
+                <div style="float:right"><i class="icon-refresh"></i></div>
+                <table style="margin-left:20px">
+                    <tbody>
+                    <tr>
+                        <td>CDR in db:</td>
+                        <td>3000</td>
+                    </tr>
 
-                </div>
+                    <tr>
+                        <td>VSA in db:</td>
+                        <td>6000</td>
+                    </tr>
+                    </tbody>
+                </table>
+
             </div>
+        </div>
     </div>
 </div>
 
 </div>
 
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
+        $("#trigger_import").click(function () {
+            $("#trigger_import").removeClass("btn-primary");
+
+            window.setTimeout(function () {
+                $("#trigger_import").addClass("btn-primary");
+            }, 2000);
+
+
+            $.get("/import/trigger");
+
+        });
+
         update_status()
     })
 
-    update_status = function() {
-        $.getJSON("/import/status",  function(data){
-            alert(data.message)
+    update_status = function () {
+        $.getJSON("/import/status", function (data) {
+            alert(data.message);
         })
     }
 
