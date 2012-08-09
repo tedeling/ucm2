@@ -10,7 +10,7 @@ object ImportController extends Controller {
   }
 
   def triggerImport = Action {
-    DataImportManager.schedule()
+//    DataImportManager.schedule()
     Ok(views.html.dataimport_page())
   }
 
