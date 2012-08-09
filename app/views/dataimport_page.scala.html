@@ -40,12 +40,12 @@
                     <tbody>
                     <tr>
                         <td>Currently:</td>
-                        <td>idle</td>
+                        <td id="status">idle</td>
                     </tr>
 
                     <tr>
-                        <td>Last run:</td>
-                        <td>2012-08-09 23:20</td>
+                        <td id="startTimeLabel">Last run:</td>
+                        <td id="startTimeValue">2012-08-09 23:20</td>
                     </tr>
 
                     <tr>
@@ -113,8 +113,26 @@
     })
 
     update_status = function () {
-        $.getJSON("/import/status", function (data) {
-            alert(data.message);
+        $.getJSON("/import/status", function (statusObj) {
+
+            var started = (statusObj.started === 'true');
+            var finished = (statusObj.finished === 'true');
+
+            if (started) {
+                if (finished) {
+                    $("#status").text("finished");
+                    $("#startTimeLabel").text("Last run:");
+                } else {
+                    $("#status").text("running");
+                    $("#startTimeLabel").text("Start time:");
+                }
+            } else {
+                $("#status").text("finished");
+                $("#startTimeLabel").text("Last run:");
+            }
+
+            $("#startTimeValue").text(statusObj.start);
+
         })
     }
 

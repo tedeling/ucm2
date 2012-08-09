@@ -3,8 +3,12 @@ package controllers.dataimport
 import play.api.mvc.{Action, Controller}
 import dataimport.{DataImportStatus, DataImportManager}
 import play.api.libs.json.Json.toJson
+import org.joda.time.LocalDate
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 
 object ImportController extends Controller {
+  val DateFormatter = DateTimeFormat.forPattern("YYYY-MM-dd hh:mm:ss")
+
   def index = Action {
     Ok(views.html.dataimport_page())
   }
@@ -26,9 +30,13 @@ object ImportController extends Controller {
     }))
   }
 
-  def fetchStatus() = Action { request =>
-   Ok(toJson(
-        Map("status" -> "OK", "message" -> ("Hello there"))
+  def fetchStatus() = Action {
+    request =>
+      val status = DataImportManager.status()
+      Ok(toJson(
+        Map("started" -> status.started.toString,
+            "finished" -> status.finished.toString,
+            "start" -> (status.startTime.getOrElse(new LocalDate()).toString(DateFormatter)))
       ))
   }
 }
