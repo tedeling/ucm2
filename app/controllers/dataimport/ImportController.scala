@@ -6,15 +6,7 @@ import play.api.libs.json.Json.toJson
 
 object ImportController extends Controller {
   def index = Action {
-    val status: DataImportStatus = DataImportStatus() // DataImportManager.status()
-
-    Ok(views.html.status_page(if (status.finished) {
-      "finished"
-    } else if (status.started) {
-      "started"
-    } else {
-      "idle"
-    }))
+    Ok(views.html.dataimport_page())
   }
 
   def triggerImport = Action {
