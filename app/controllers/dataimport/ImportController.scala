@@ -36,7 +36,7 @@ object ImportController extends Controller {
       Ok(toJson(
         Map("started" -> status.started.toString,
             "finished" -> status.finished.toString,
-            "start" -> (status.startTime.getOrElse(new LocalDate()).toString(DateFormatter)))
+            "start" -> (status.startTime .getOrElse(new LocalDate()).toString(DateFormatter)))
       ))
   }
 }

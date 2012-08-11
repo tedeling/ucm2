@@ -106,13 +106,14 @@
 
 
             $.get("/import/trigger");
-
         });
 
-        update_status()
-    })
+        update_status();
+    });
 
     update_status = function () {
+        window.setTimeout(update_status, 1000)
+
         $.getJSON("/import/status", function (statusObj) {
 
             var started = (statusObj.started === 'true');

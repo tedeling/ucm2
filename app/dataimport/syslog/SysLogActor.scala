@@ -35,10 +35,10 @@ class SysLogImportMaster extends Actor {
       } ! SysLogMessagesFetch
     }
 
-    case SysLogMessagesResult(value) => {
-      Logger.info("Received %d syslog events".format(value.size))
+    case SysLogMessagesResult(messages) => {
+      Logger.info("Received %d syslog events".format(messages.size))
 
-      value map (msg => sysLogRouter ! SysLogParse(msg._2))
+      messages map (msg => sysLogRouter ! SysLogParse(msg._2))
     }
   }
 }
@@ -52,7 +52,10 @@ class SysLogParseWorker extends Actor {
 
       SysLogParser.parse(entry) match {
         case Some(x) => x match {
-          case cdr: Cdr => persistRouter ! SysLogMessagesPersistCdr(cdr)
+          case cdr: Cdr => {
+            persistRouter ! SysLogMessagesPersistCdr(cdr)
+
+          }
           case vsa: CdrVsa => persistRouter ! SysLogMessagesPersistCdrVsa(vsa)
         }
         case None =>
