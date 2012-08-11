@@ -1,12 +1,17 @@
 package dataimport.syslog
 
 import akka.actor.Actor
+import org.joda.time.LocalDateTime
 
 class DataImportStatistics
 {
   var cdr: Int = 0
   var vsa: Int = 0
   var dupes: Int = 0
+  var startTime: LocalDateTime = new LocalDateTime()
+  var endTime: Option[LocalDateTime] = None
+
+  def finished:Boolean = endTime.isDefined
 }
 
 class DataImportStatisticsListener extends Actor {
@@ -15,6 +20,7 @@ class DataImportStatisticsListener extends Actor {
   override def receive = {
     case DuplicateMessage => {
       stats.dupes = stats.dupes + 1
+      println("fefe")
     }
     case CdrMessage => {
       stats.cdr = stats.cdr + 1
@@ -27,7 +33,7 @@ class DataImportStatisticsListener extends Actor {
       stats = new DataImportStatistics
     }
 
-    case ProvideStatistics => stats
+    case ProvideStatistics => sender ! stats
   }
 }
 

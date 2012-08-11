@@ -12,6 +12,7 @@ import play.api.db.DB
 import akka.util.Timeout
 import akka.util.duration._
 import akka.pattern.ask
+import akka.dispatch.Await
 
 class SysLogMessages(val statsListener: ActorRef)
 
@@ -36,9 +37,9 @@ class SysLogImportMaster extends Actor {
   protected def receive = {
 
     case SysLogImport(statsListener) => {
-
       val fetchFuture = sysLogMessageFetchWorker ? SysLogMessagesFetch mapTo manifest[List[(Long, String)]]
       fetchFuture map (_ map (msg => sysLogParseWorker ! SysLogParse(msg._2, statsListener)))
+      Await.result(fetchFuture, 10 seconds)
     }
   }
 }
@@ -49,8 +50,6 @@ class SysLogParseWorker extends Actor {
 
   protected def receive = {
     case SysLogParse(rawSysLogEntry, statsListener) => {
-      implicit val stats: SysLogParsingStatistics = new SysLogParsingStatistics()
-
       SysLogParser.parse(rawSysLogEntry) match {
         case Some(x) => x match {
           case cdr: Cdr => persistRouter ! SysLogMessagesPersistCdr(cdr, statsListener)

@@ -1,10 +1,9 @@
 package dataimport.syslog.parser
 
-import domain.{AbstractCdr, CdrVsa, Cdr, SysLog}
-import dataimport.syslog.SysLogParsingStatistics
+import domain.{AbstractCdr, CdrVsa, Cdr}
 
 object SysLogParser {
-  def parse(syslog: String)(implicit stats: SysLogParsingStatistics): Option[AbstractCdr] = {
+  def parse(syslog: String): Option[AbstractCdr] = {
     val rawCdr = RawCdr(syslog)
 
     rawCdr.cdrType() match {
@@ -14,7 +13,7 @@ object SysLogParser {
     }
   }
 
-  def cdrHistoryParser(rawCdr: RawCdr)(implicit stats: SysLogParsingStatistics): Option[Cdr] = {
+  def cdrHistoryParser(rawCdr: RawCdr): Option[Cdr] = {
 
     val builder = new CdrBuilder(rawCdr.cdr)
 
@@ -27,7 +26,7 @@ object SysLogParser {
     builder.build()
   }
 
-  def vsaParser(rawCdr: RawCdr)(implicit stats: SysLogParsingStatistics): Option[CdrVsa] = {
+  def vsaParser(rawCdr: RawCdr): Option[CdrVsa] = {
     val builder = new CdrVsaBuilder(rawCdr.cdr)
 
     val splittedCdr = rawCdr.splitWithoutType()

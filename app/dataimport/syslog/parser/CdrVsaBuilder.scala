@@ -1,7 +1,6 @@
 package dataimport.syslog.parser
 
 import scala.Some
-import dataimport.syslog.SysLogParsingStatistics
 import domain.{FeatureStatus, ForwardingReason, FeatureName, CdrVsa}
 import play.api.Logger
 import dataimport.util.DateFormatter
@@ -10,13 +9,11 @@ class CdrVsaBuilder(val rawCdr: String) extends BuilderMap(separator = ":") {
 
   val InvalidConnectionId = "0000"
 
-  def build()(implicit stats: SysLogParsingStatistics): Option[CdrVsa] = {
+  def build(): Option[CdrVsa] = {
     if (!cdr.contains("fcid")) {
-      stats.addError()
       Logger.error("Failed to parse CDR VSA, no connectionId found in %s".format(rawCdr))
       None
     } else if (cdr("fcid") == InvalidConnectionId) {
-      stats.addWarning()
       None
     } else {
       val rawName: String = cdr("fn")
@@ -33,7 +30,6 @@ class CdrVsaBuilder(val rawCdr: String) extends BuilderMap(separator = ":") {
             case Some("0") => FeatureStatus.SUCCESS
             case Some("1") => FeatureStatus.FAIL
             case None => {
-              stats.addWarning()
               Logger.warn("No feature status found, assuming fail")
               FeatureStatus.FAIL
             }
@@ -47,10 +43,8 @@ class CdrVsaBuilder(val rawCdr: String) extends BuilderMap(separator = ":") {
           calledNumber = cdr.getOrElse("cdn", ""),
           callingNumber = cdr.getOrElse("cgn", ""),
           originalRecord = rawCdr))
-        stats.addSuccess()
         someCdrVsa
       } else {
-        stats.addWarning()
         Logger.warn("Unknown VSA name '%s'".format(rawName))
         None
       }

@@ -1,8 +1,6 @@
 package dataimport.syslog.parser
 
-import collection.mutable.{Map => MutableMap}
 import play.api.Logger
-import dataimport.syslog.SysLogParsingStatistics
 import domain.Cdr
 import dataimport.util.DateFormatter
 
@@ -11,14 +9,11 @@ class CdrBuilder(val rawCdr: String) extends BuilderMap(separator = " ") {
 
   val InvalidConnectionId = "0000"
 
-  def build()(implicit stats: SysLogParsingStatistics): Option[Cdr] = {
+  def build(): Option[Cdr] = {
     if (!cdr.contains("connectionid")) {
-      stats.addError()
       Logger.error("Failed to parse CDR, no connectionId found %s".format(rawCdr))
       None
     } else if (cdr("connectionid") == InvalidConnectionId) {
-      stats.addWarning()
-//      Logger.warn("Discarding connectionId: 0000. CDR: %s".format(rawCdr))
       None
     } else {
       val someCdr = Some(Cdr(connectionId = cdr("connectionid"),
@@ -38,7 +33,6 @@ class CdrBuilder(val rawCdr: String) extends BuilderMap(separator = " ") {
         receivedPackets = cdr.getOrElse("receivepackets", "0").toLong,
         receivedBytes = cdr.getOrElse("receivebytes", "0").toLong,
         originalRecord = rawCdr))
-      stats.addSuccess()
       someCdr
     }
   }

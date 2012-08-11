@@ -44,23 +44,23 @@
                     </tr>
 
                     <tr>
-                        <td id="startTimeLabel">Last run:</td>
-                        <td id="startTimeValue">2012-08-09 23:20</td>
+                        <td id="duration">Last run:</td>
+                        <td id="durationValue">2012-08-09 23:20 - 2012-08-09 23:20</td>
                     </tr>
 
                     <tr>
                         <td>CDR's found:</td>
-                        <td>3000</td>
+                        <td id="cdr">3000</td>
                     </tr>
 
                     <tr>
                         <td>VSA's found:</td>
-                        <td>4000</td>
+                        <td id="vsa">4000</td>
                     </tr>
 
                     <tr>
                         <td>Duplicates:</td>
-                        <td>2000</td>
+                        <td id="dupes">2000</td>
                     </tr>
                     </tbody>
                 </table>
@@ -115,24 +115,26 @@
         window.setTimeout(update_status, 1000)
 
         $.getJSON("/import/status", function (statusObj) {
-
-            var started = (statusObj.started === 'true');
+                                     ""
             var finished = (statusObj.finished === 'true');
+            var startTime = statusObj.start
+            var endTime = statusObj.end
 
-            if (started) {
-                if (finished) {
-                    $("#status").text("finished");
-                    $("#startTimeLabel").text("Last run:");
-                } else {
-                    $("#status").text("running");
-                    $("#startTimeLabel").text("Start time:");
-                }
-            } else {
+            if (finished) {
                 $("#status").text("finished");
-                $("#startTimeLabel").text("Last run:");
+                $("#duration").text("Last run:");
+                $("#durationValue").text(startTime + " - " + endTime);
+
+            } else {
+                $("#status").text("running");
+                $("#duration").text("Start time:");
+                $("#durationValue").text(startTime);
             }
 
-            $("#startTimeValue").text(statusObj.start);
+            $("#cdr").text(statusObj.cdr);
+            $("#vsa").text(statusObj.vsa);
+            $("#dupes").text(statusObj.dupes);
+
 
         })
     }
