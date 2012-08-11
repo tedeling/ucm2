@@ -18,15 +18,15 @@ object ImportController extends Controller {
     Ok(toJson(Map("status" -> "OK")))
   }
 
-  def status = Action {
-    val status: DataImportStatus = DataImportManager.status()
-
-    Ok(views.html.status_page(if (status.finished) {
-      "idle"
-    } else {
-      "started"
-    }))
-  }
+//  def status = Action {
+//    val status: DataImportStatus = DataImportManager.status()
+//
+//    Ok(views.html.status_page(if (status.finished) {
+//      "idle"
+//    } else {
+//      "started"
+//    }))
+//  }
 
   def fetchStatus() = Action {
     request =>

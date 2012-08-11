@@ -5,6 +5,7 @@ import akka.dispatch.Await
 import akka.pattern.ask
 import akka.util.Timeout
 import akka.util.duration._
+import util.ActorUtil
 import ActorUtil._
 
 object DataImportManager {
@@ -13,7 +14,7 @@ object DataImportManager {
   def status(): DataImportStatus = {
     implicit val timeout = Timeout(5 seconds)
     val future = findOrCreateDataImport ? Status
-    Await.result(future, 1 second).asInstanceOf[DataImportStatus]
+    Await.result(future, 5 seconds).asInstanceOf[DataImportStatus]
   }
 
   def schedule() {

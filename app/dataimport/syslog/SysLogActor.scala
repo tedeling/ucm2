@@ -10,7 +10,7 @@ import akka.routing.RoundRobinRouter
 import domain.{CdrVsa, Cdr}
 import play.api.db.DB
 import akka.util.Timeout
-import akka.dispatch.Future
+import akka.util.duration._
 import akka.pattern.ask
 
 class SysLogMessages(val statsListener: ActorRef)
@@ -31,21 +31,14 @@ class SysLogImportMaster extends Actor {
   val sysLogParseWorker = context.actorOf(Props[SysLogParseWorker].withRouter(RoundRobinRouter(NrOfParsingActors)), name = "sysLogParseRouter")
   val sysLogMessageFetchWorker = context.actorOf(Props[SysLogMessageFetchWorker], name = "sysLogDao")
 
-  implicit val timeout = Timeout(5000)
+  implicit val timeout = Timeout(5 seconds)
 
   protected def receive = {
 
     case SysLogImport(statsListener) => {
 
       val fetchFuture = sysLogMessageFetchWorker ? SysLogMessagesFetch mapTo manifest[List[(Long, String)]]
-
-
-//      fetchFuture
-//
-//        sysLogMessageFetchWorker  ? SysLogMessagesFetch mapTo[List[(Long, String)]]
-//      Logger.info("Received %d syslog events".format(messages.size))
-
-      fetchFuture map (x => x map (msg => sysLogParseWorker ! SysLogParse(msg._2, statsListener)))
+      fetchFuture map (_ map (msg => sysLogParseWorker ! SysLogParse(msg._2, statsListener)))
     }
   }
 }
@@ -78,7 +71,7 @@ class SysLogMessagePersistWorker extends Actor {
     case message: SysLogMessagesPersistCdr => persistCdr(message.cdr, message.statsListener)
   }
 
-  def persistVsa(vsa: CdrVsa, statsListener:ActorRef) {
+  def persistVsa(vsa: CdrVsa, statsListener: ActorRef) {
     DB.withConnection {
       implicit c => {
         if (SysLogDao.vsaExists(vsa.originalRecord)) {
@@ -92,7 +85,7 @@ class SysLogMessagePersistWorker extends Actor {
     }
   }
 
-  def persistCdr(cdr: Cdr, statsListener:ActorRef) {
+  def persistCdr(cdr: Cdr, statsListener: ActorRef) {
     DB.withConnection {
       implicit c => {
         if (SysLogDao.cdrExists(cdr.originalRecord)) {

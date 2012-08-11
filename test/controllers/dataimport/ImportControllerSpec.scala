@@ -17,7 +17,15 @@ class ImportControllerSpec extends Specification {
 
     "trigger import" in {
       runInServer {
-        val Some(result) = routeAndCall(FakeRequest(GET, "/trigger_import"))
+        val Some(result) = routeAndCall(FakeRequest(GET, "/import/trigger"))
+
+        status(result) must equalTo(OK)
+      }
+    }
+
+    "get statistics" in {
+      runInServer {
+        val Some(result) = routeAndCall(FakeRequest(GET, "/import/status"))
 
         status(result) must equalTo(OK)
       }

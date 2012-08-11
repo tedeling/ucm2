@@ -10,7 +10,7 @@ class DataImportStatistics
 }
 
 class DataImportStatisticsListener extends Actor {
-  var stats: DataImportStatistics = new DataImportStatistics
+  var stats = new DataImportStatistics
 
   override def receive = {
     case DuplicateMessage => {
@@ -22,6 +22,12 @@ class DataImportStatisticsListener extends Actor {
     case CdrVsaMessage => {
       stats.vsa = stats.vsa + 1
     }
+
+    case ResetStatistics => {
+      stats = new DataImportStatistics
+    }
+
+    case ProvideStatistics => stats
   }
 }
 
@@ -30,3 +36,5 @@ sealed trait StatisticsMessage
 case object DuplicateMessage extends StatisticsMessage
 case object CdrVsaMessage extends StatisticsMessage
 case object CdrMessage extends StatisticsMessage
+case object ResetStatistics extends StatisticsMessage
+case object ProvideStatistics extends StatisticsMessage

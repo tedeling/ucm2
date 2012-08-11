@@ -1,4 +1,4 @@
-package dataimport
+package dataimport.util
 
 import akka.actor.{Actor, InvalidActorNameException, Props, ActorRef}
 import play.api.libs.concurrent.Akka
