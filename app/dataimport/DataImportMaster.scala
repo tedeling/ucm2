@@ -1,28 +1,26 @@
 package dataimport
 
-import akka.actor.{ActorPath, Props, ActorRef, Actor}
+import akka.actor.{Props, Actor}
 import akka.routing.RoundRobinRouter
-import org.joda.time.{LocalDateTime, DateTime}
-import syslog.SysLogImportMaster
+import syslog.{DataImportStatisticsListener, SysLogImportMaster}
 
 class DataImportMaster(nrOfWorkers: Int) extends Actor {
 
-  val sysLogRouter = context.actorOf(Props[SysLogImportMaster].withRouter(RoundRobinRouter(nrOfWorkers)), name = "sysLogRouter")
+  //  implicit val timeout = Timeout(5 seconds)
 
-  var status: DataImportStatus = DataImportStatus()
+  val sysLogRouter = context.actorOf(Props[SysLogImportMaster].withRouter(RoundRobinRouter(nrOfWorkers)), name = "sysLogRouter")
+  val statsListener = context.actorOf(Props[DataImportStatisticsListener], name = "statisticsListener")
+
 
   def receive = {
     case Status => {
-      sender ! status
+      //      statsListener.forward()
     }
-    case TriggerDataImport => {
-      status = new DataImportStatus(startTime = Some(new LocalDateTime()), started = true)
 
-      sysLogRouter ! SysLogImport
+    case TriggerDataImport => {
+      sysLogRouter ! SysLogImport(statsListener)
     }
     case SysLogResult => {
-      status = status.copy(endTime = Some(new LocalDateTime()), finished = true)
-
       println("syslog imported")
     }
   }

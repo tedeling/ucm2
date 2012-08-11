@@ -8,7 +8,6 @@ import akka.util.duration._
 import ActorUtil._
 
 object DataImportManager {
-
   val DataImportName = "dataimport"
 
   def status(): DataImportStatus = {

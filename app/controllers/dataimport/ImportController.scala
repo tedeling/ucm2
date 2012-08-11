@@ -4,7 +4,7 @@ import play.api.mvc.{Action, Controller}
 import dataimport.{DataImportStatus, DataImportManager}
 import play.api.libs.json.Json.toJson
 import org.joda.time.LocalDate
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
+import org.joda.time.format.DateTimeFormat
 
 object ImportController extends Controller {
   val DateFormatter = DateTimeFormat.forPattern("YYYY-MM-dd hh:mm:ss")
@@ -22,11 +22,9 @@ object ImportController extends Controller {
     val status: DataImportStatus = DataImportManager.status()
 
     Ok(views.html.status_page(if (status.finished) {
-      "finished"
-    } else if (status.started) {
-      "started"
-    } else {
       "idle"
+    } else {
+      "started"
     }))
   }
 
@@ -34,9 +32,9 @@ object ImportController extends Controller {
     request =>
       val status = DataImportManager.status()
       Ok(toJson(
-        Map("started" -> status.started.toString,
-            "finished" -> status.finished.toString,
-            "start" -> (status.startTime .getOrElse(new LocalDate()).toString(DateFormatter)))
+        Map("started" -> "fe",
+          "finished" -> status.finished.toString,
+          "start" -> (status.startTime.getOrElse(new LocalDate()).toString(DateFormatter)))
       ))
   }
 }
