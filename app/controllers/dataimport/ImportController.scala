@@ -13,26 +13,28 @@ object ImportController extends Controller {
   }
 
   def triggerImport = Action {
-    DataImportManager.schedule()
-    Ok(toJson(Map("status" -> "OK")))
+    if (DataImportManager.schedule()) {
+      Ok(toJson(Map("status" -> "OK")))
+    } else {
+      Status(409)
+    }
   }
 
   def fetchStatus() = Action {
     request =>
       DataImportManager.status() match {
         case Some(status) => Ok(toJson(
-                                  Map("finished" -> status.finished.toString,
-                                    "start" -> (status.start.toString(DateFormatter)),
-                                    "end" -> (status.end match {
-                                      case Some(date) => date.toString(DateFormatter)
-                                      case None => "--"
-                                    }),
-                                    "cdr" -> status.cdrCount.toString,
-                                    "vsa" -> status.vsaCount.toString,
-                                    "dupes" -> status.dupeCount.toString))
-                                )
+          Map("finished" -> status.finished.toString,
+            "start" -> (status.start.toString(DateFormatter)),
+            "end" -> (status.end match {
+              case Some(date) => date.toString(DateFormatter)
+              case None => "--"
+            }),
+            "cdr" -> status.cdrCount.toString,
+            "vsa" -> status.vsaCount.toString,
+            "dupes" -> status.dupeCount.toString))
+        )
         case None => NotFound
       }
-
   }
 }

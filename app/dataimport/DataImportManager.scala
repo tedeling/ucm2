@@ -12,15 +12,22 @@ import ActorUtil._
 object DataImportManager {
   val DataImportName = "dataimport"
 
-  def status(): DataImportStatistics = {
+  def status(): Option[DataImportStatistics] = {
     implicit val timeout = Timeout(2 seconds)
     val future = findOrCreateDataImport ? Status
-    Await.result(future, 2 seconds).asInstanceOf[DataImportStatistics]
+    Await.result(future, 2 seconds).asInstanceOf[Option[DataImportStatistics]]
   }
 
-  def schedule() {
-    val status = status()
-    findOrCreateDataImport ! TriggerDataImport
+  def schedule():Boolean = {
+    if (status() match {
+      case Some(status) => status.finished
+      case None => true
+    }) {
+      findOrCreateDataImport ! TriggerDataImport
+      true
+    } else {
+      false
+    }
   }
 
   def findOrCreateDataImport: ActorRef = {
