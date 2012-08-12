@@ -34,7 +34,7 @@ object ImportController extends Controller {
             "vsa" -> status.vsaCount.toString,
             "dupes" -> status.dupeCount.toString))
         )
-        case None => NotFound
+        case None => NoContent
       }
   }
 }

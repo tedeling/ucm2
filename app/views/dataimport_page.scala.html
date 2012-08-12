@@ -2,23 +2,21 @@
 <div class="page-header"><h1>Data Import administration</h1></div>
 
 <div class="row">
-    <div class="span8">
+    <div class="span6">
         <h2>Trigger</h2>
         Trigger an immediate data import of CDR and ACD data from your router.
         <br/>
         When an import is currently running this trigger will be ignored.
         <br/>
-        <br/>
+        <div id="importAlreadyRunning" style="display:none;" class="alert alert-info">
+            An import is already running, this trigger will be ignored.
+        </div>
+        <div id="importRunningPlaceholder"><br /></div>
 
         <button class="btn btn-primary" id="trigger_import">
             <i class="icon-refresh"></i>
             Trigger import
         </button>
-
-        <div id="importAlreadyRunning" class="display:none">
-            <br/>
-            An import is already running, this trigger will be ignored.
-        </div>
 
         <br/>
         <br/>
@@ -36,7 +34,7 @@
             Configure</a>
     </div>
 
-    <div class="span4">
+    <div class="span6">
         <h2>Status</h2>
 
         <div class="well">
@@ -70,7 +68,7 @@
                     </tbody>
                 </table>
 
-                <div id="noStatus" style="display:none">
+                <div id="noStatus" style="margin-left: 20px;display:none">
                     No import yet.
                 </div>
             </div>
@@ -113,50 +111,56 @@
             }, 2000);
 
 
-            $.get("/import/trigger");
+            $.get("/import/trigger")
+                .error(function () {
+                    $("#importAlreadyRunning").show();
+                    $("#importRunningPlaceholder").hide();
+                    $("#importAlreadyRunning").delay(2000).hide(500);
+                    $("#importRunningPlaceholder").delay(2000).show(500);
+                });
         })
-            .error(function () {
-                $("#importAlreadyRunning").show();
-                $("#importAlreadyRunning").delay(2000).show(500);
 
-            })
 
         update_status();
     });
 
     update_status = function () {
-        $.getJSON("/import/status", function (statusObj) {
-            var finished = (statusObj.finished === 'true');
-            var startTime = statusObj.start
-            var endTime = statusObj.end
 
-            if (finished) {
-                $("#status").text("finished");
-                $("#duration").text("Last run:");
-                $("#durationValue").text(startTime + " - " + endTime);
+        $.ajax({
+            url: '/import/status',
+            dataType: 'json',
+            success: function( statusObj, status, xhr ) {
+                if (xhr.status == 200) {
+                    var finished = (statusObj.finished === 'true');
+                    var startTime = statusObj.start
+                    var endTime = statusObj.end
 
-            } else {
-                $("#status").text("running");
-                $("#duration").text("Start time:");
-                $("#durationValue").text(startTime);
+                    if (finished) {
+                        $("#status").text("finished");
+                        $("#duration").text("Last run:");
+                        $("#durationValue").text(startTime + " - " + endTime);
+
+                    } else {
+                        $("#status").text("running");
+                        $("#duration").text("Start time:");
+                        $("#durationValue").text(startTime);
+                    }
+
+                    $("#cdr").text(statusObj.cdr);
+                    $("#vsa").text(statusObj.vsa);
+                    $("#dupes").text(statusObj.dupes);
+
+                    $("#withStatus").show();
+                    $("#noStatus").hide();
+
+                    window.setTimeout(update_status, !finished ? 500 : 1000)
+                } else {
+                    $("#withStatus").hide();
+                    $("#noStatus").show()
+                    window.setTimeout(update_status, 1000)
+                }
             }
-
-            $("#cdr").text(statusObj.cdr);
-            $("#vsa").text(statusObj.vsa);
-            $("#dupes").text(statusObj.dupes);
-
-            $("#withStatus").show();
-            $("#noStatus").hide()
-
-            window.setTimeout(update_status, !finished ? 500 : 1000)
-        })
-            .error(function () {
-                $("#withStatus").hide();
-                $("#noStatus").show()
-            });
+        });
     }
-
-    is_running =
-
 </script>
 }

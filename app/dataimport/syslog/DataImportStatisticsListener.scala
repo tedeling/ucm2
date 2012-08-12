@@ -45,12 +45,12 @@ class DataImportStatisticsListener extends Actor {
   var stats:Option[DataImportStatistics] = None
 
   override def receive = {
-    case ResetStatistics => stats = new DataImportStatistics
-    case DuplicateMessage => stats.addDupe()
-    case CdrMessage => stats.addCdr()
-    case CdrVsaMessage => stats.addVsa()
+    case ResetStatistics => stats = Some(new DataImportStatistics())
+    case DuplicateMessage => stats.get.addDupe()
+    case CdrMessage => stats.get.addCdr()
+    case CdrVsaMessage => stats.get.addVsa()
     case ProvideStatistics => sender ! stats
-    case SessionSize(size) => stats.size = size
+    case SessionSize(size) => stats.get.size = size
   }
 }
 
