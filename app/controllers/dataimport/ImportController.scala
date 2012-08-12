@@ -22,14 +22,14 @@ object ImportController extends Controller {
       val status = DataImportManager.status()
       Ok(toJson(
         Map("finished" -> status.finished.toString,
-          "start" -> (status.startTime.toString(DateFormatter)),
-          "end" -> (status.endTime match {
+          "start" -> (status.start.toString(DateFormatter)),
+          "end" -> (status.end match {
             case Some(date) => date.toString(DateFormatter)
             case None => "--"
           }),
-          "cdr" -> status.cdr.toString,
-          "vsa" -> status.vsa.toString,
-          "dupes" -> status.dupes.toString))
+          "cdr" -> status.cdrCount.toString,
+          "vsa" -> status.vsaCount.toString,
+          "dupes" -> status.dupeCount.toString))
       )
   }
 }

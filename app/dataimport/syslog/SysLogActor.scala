@@ -17,13 +17,9 @@ import akka.dispatch.Await
 class SysLogMessages(val statsListener: ActorRef)
 
 case class SysLogMessagesFetch(override val statsListener: ActorRef) extends SysLogMessages(statsListener)
-
 case class SysLogMessagesPersistCdr(cdr: Cdr, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
-
 case class SysLogMessagesPersistCdrVsa(cdrVsa: CdrVsa, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
-
 case class SysLogMessagesResult(sysLogEntries: List[(Long, String)], override val statsListener: ActorRef) extends SysLogMessages(statsListener)
-
 case class SysLogParse(rawSysLogEntry: String, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 
 class SysLogImportMaster extends Actor {
@@ -36,7 +32,9 @@ class SysLogImportMaster extends Actor {
 
   protected def receive = {
     case SysLogMessagesResult(sysLogEntries, statsListener) => {
-      Logger.info("Received %d syslog events".format(sysLogEntries.size))
+      val size = sysLogEntries.size
+      statsListener ! SessionSize(size)
+      Logger.info("Received %d syslog events".format(size))
 
       sysLogEntries map (msg => sysLogParseWorker ! SysLogParse(msg._2, statsListener))
     }
