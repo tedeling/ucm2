@@ -7,7 +7,7 @@ class DataImportStatistics {
   private var cdr: Int = 0
   private var vsa: Int = 0
   private var dupes: Int = 0
-  private var startTime: LocalDateTime = new LocalDateTime()
+  private val startTime: LocalDateTime = new LocalDateTime()
   private var endTime: Option[LocalDateTime] = None
   private[syslog] var size: Int = _
 

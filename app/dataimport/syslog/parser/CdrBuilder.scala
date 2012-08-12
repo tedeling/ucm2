@@ -5,8 +5,6 @@ import domain.Cdr
 import dataimport.util.DateFormatter
 
 class CdrBuilder(val rawCdr: String) extends BuilderMap(separator = " ") {
-//  private val LOG: Logger = Logger.getLogger(classOf[CdrBuilder])
-
   val InvalidConnectionId = "0000"
 
   def build(): Option[Cdr] = {

@@ -23,13 +23,13 @@ class ImportControllerSpec extends Specification {
       }
     }
 
-    "get statistics" in {
-      runInServer {
-        val Some(result) = routeAndCall(FakeRequest(GET, "/import/status"))
-
-        status(result) must equalTo(OK)
-      }
-    }
+//    "get statistics" in {
+//      runInServer {
+//        val Some(result) = routeAndCall(FakeRequest(GET, "/import/status"))
+//
+//        status(result) must equalTo(OK)
+//      }
+//    }
 
   }
 }
