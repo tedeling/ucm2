@@ -16,7 +16,7 @@ import akka.dispatch.Await
 
 class SysLogMessages(val statsListener: ActorRef)
 
-case object SysLogMessagesFetch
+case class SysLogMessagesFetch(override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 
 case class SysLogMessagesPersistCdr(cdr: Cdr, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 
@@ -32,14 +32,20 @@ class SysLogImportMaster extends Actor {
   val sysLogParseWorker = context.actorOf(Props[SysLogParseWorker].withRouter(RoundRobinRouter(NrOfParsingActors)), name = "sysLogParseRouter")
   val sysLogMessageFetchWorker = context.actorOf(Props[SysLogMessageFetchWorker], name = "sysLogDao")
 
-  implicit val timeout = Timeout(5 seconds)
+  implicit val timeout = Timeout(100 seconds)
 
   protected def receive = {
+    case SysLogMessagesResult(sysLogEntries, statsListener) => {
+      Logger.info("Received %d syslog events".format(sysLogEntries.size))
+
+      sysLogEntries map (msg => sysLogParseWorker ! SysLogParse(msg._2, statsListener))
+    }
 
     case SysLogImport(statsListener) => {
-      val fetchFuture = sysLogMessageFetchWorker ? SysLogMessagesFetch mapTo manifest[List[(Long, String)]]
-      fetchFuture map (_ map (msg => sysLogParseWorker ! SysLogParse(msg._2, statsListener)))
-      Await.result(fetchFuture, 10 seconds)
+      sysLogMessageFetchWorker ! SysLogMessagesFetch(statsListener)
+//      val fetchFuture = sysLogMessageFetchWorker ? SysLogMessagesFetch mapTo manifest[List[(Long, String)]]
+//      fetchFuture map (_ map (msg => sysLogParseWorker ! SysLogParse(msg._2, statsListener)))
+//      Await.result(fetchFuture, 100 seconds)
     }
   }
 }
@@ -75,7 +81,6 @@ class SysLogMessagePersistWorker extends Actor {
       implicit c => {
         if (SysLogDao.vsaExists(vsa.originalRecord)) {
           statsListener ! DuplicateMessage
-          Logger.info("vsa exists")
         } else {
           SysLogDao.persistCdrVsa(vsa)
           statsListener ! CdrVsaMessage
@@ -89,7 +94,6 @@ class SysLogMessagePersistWorker extends Actor {
       implicit c => {
         if (SysLogDao.cdrExists(cdr.originalRecord)) {
           statsListener ! DuplicateMessage
-          Logger.info("cdr exists")
         } else {
           SysLogDao.persistCdr(cdr)
           statsListener ! CdrMessage
@@ -101,9 +105,9 @@ class SysLogMessagePersistWorker extends Actor {
 
 class SysLogMessageFetchWorker extends Actor {
   protected def receive = {
-    case SysLogMessagesFetch =>
+    case SysLogMessagesFetch(listener) =>
       Logger.info("Fetching syslog dao")
-      SysLogDao.findAfterId(0)
+      sender ! SysLogMessagesResult(SysLogDao.findAfterId(0), listener)
   }
 }
 

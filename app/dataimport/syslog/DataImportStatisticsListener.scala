@@ -20,7 +20,6 @@ class DataImportStatisticsListener extends Actor {
   override def receive = {
     case DuplicateMessage => {
       stats.dupes = stats.dupes + 1
-      println("fefe")
     }
     case CdrMessage => {
       stats.cdr = stats.cdr + 1
