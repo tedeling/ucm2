@@ -36,7 +36,7 @@
 
         <div class="well">
             <div class="row">
-                <table style="margin-left:20px">
+                <table style="margin-left:20px" id="withStatus" style="display:none">
                     <tbody>
                     <tr>
                         <td>Currently:</td>
@@ -64,6 +64,10 @@
                     </tr>
                     </tbody>
                 </table>
+
+                <div id="noStatus" style="display:none">
+                    No import yet.
+                </div>
             </div>
         </div>
 
@@ -112,10 +116,7 @@
     });
 
     update_status = function () {
-        window.setTimeout(update_status, 1000)
-
         $.getJSON("/import/status", function (statusObj) {
-                                     ""
             var finished = (statusObj.finished === 'true');
             var startTime = statusObj.start
             var endTime = statusObj.end
@@ -135,10 +136,16 @@
             $("#vsa").text(statusObj.vsa);
             $("#dupes").text(statusObj.dupes);
 
+            $("#withStatus").show();
+            $("#noStatus").hide()
 
+            window.setTimeout(update_status, !finished ? 500 : 1000)
+        })
+        .error(function () {
+            $("#withStatus").hide();
+            $("#noStatus").show()
         })
     }
-
 
 </script>
 }

@@ -6,7 +6,7 @@ import syslog.{ProvideStatistics, ResetStatistics, DataImportStatisticsListener,
 
 class DataImportMaster(nrOfWorkers: Int) extends Actor {
 
-  val sysLogRouter = context.actorOf(Props[SysLogImportMaster].withRouter(RoundRobinRouter(nrOfWorkers)), name = "sysLogRouter")
+  val sysLogRouter = context.actorOf(Props[SysLogImport Master].withRouter(RoundRobinRouter(nrOfWorkers)), name = "sysLogRouter")
   val statsListener = context.actorOf(Props[DataImportStatisticsListener], name = "statisticsListener")
 
   def receive = {

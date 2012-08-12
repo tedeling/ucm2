@@ -42,7 +42,7 @@ class DataImportStatistics {
 }
 
 class DataImportStatisticsListener extends Actor {
-  var stats = new DataImportStatistics
+  var stats:Option[DataImportStatistics] = None
 
   override def receive = {
     case ResetStatistics => stats = new DataImportStatistics

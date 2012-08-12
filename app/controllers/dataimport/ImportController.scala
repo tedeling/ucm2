@@ -19,17 +19,20 @@ object ImportController extends Controller {
 
   def fetchStatus() = Action {
     request =>
-      val status = DataImportManager.status()
-      Ok(toJson(
-        Map("finished" -> status.finished.toString,
-          "start" -> (status.start.toString(DateFormatter)),
-          "end" -> (status.end match {
-            case Some(date) => date.toString(DateFormatter)
-            case None => "--"
-          }),
-          "cdr" -> status.cdrCount.toString,
-          "vsa" -> status.vsaCount.toString,
-          "dupes" -> status.dupeCount.toString))
-      )
+      DataImportManager.status() match {
+        case Some(status) => Ok(toJson(
+                                  Map("finished" -> status.finished.toString,
+                                    "start" -> (status.start.toString(DateFormatter)),
+                                    "end" -> (status.end match {
+                                      case Some(date) => date.toString(DateFormatter)
+                                      case None => "--"
+                                    }),
+                                    "cdr" -> status.cdrCount.toString,
+                                    "vsa" -> status.vsaCount.toString,
+                                    "dupes" -> status.dupeCount.toString))
+                                )
+        case None => NotFound
+      }
+
   }
 }

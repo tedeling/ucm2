@@ -19,6 +19,7 @@ object DataImportManager {
   }
 
   def schedule() {
+    val status = status()
     findOrCreateDataImport ! TriggerDataImport
   }
 
