@@ -1,18 +1,13 @@
 package dataimport.syslog
 
-import org.specs2.mutable.Specification
-import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
-import akka.actor.{Props, ActorSystem}
-import akka.util.duration._
+import akka.testkit.{TestActorRef, TestKit}
 import akka.util.Duration
 import java.util.concurrent.TimeUnit
-import org.specs2.ScalaCheck
-import org.specs2.time.NoTimeConversions
 import org.specs2.matcher.ShouldMatchers
+import org.scalatest.{WordSpec, BeforeAndAfterAll, FunSpec}
+import akka.actor.ActorSystem
 
-class DataImportStatisticsListenerSpec extends FunSpec with BeforeAndAfterAll with ShouldMatchers with TestKit {
-
-//  extends TestKit(ActorSystem()) with Specification {
+class DataImportStatisticsListenerSpec extends TestKit(ActorSystem()) with WordSpec with BeforeAndAfterAll with ShouldMatchers  {
 
   "DataImportStatisticsListener" should {
     "reset its statistics" in {
@@ -22,11 +17,8 @@ class DataImportStatisticsListenerSpec extends FunSpec with BeforeAndAfterAll wi
         actorRef ! ResetStatistics
 
         expectNoMsg()
-
-        false
       }
     }
-
   }
 
 }
