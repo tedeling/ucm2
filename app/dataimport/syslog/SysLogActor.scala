@@ -15,7 +15,6 @@ import akka.pattern.ask
 import akka.dispatch.Await
 
 class SysLogMessages(val statsListener: ActorRef)
-
 case class SysLogMessagesFetch(override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 case class SysLogMessagesPersistCdr(cdr: Cdr, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 case class SysLogMessagesPersistCdrVsa(cdrVsa: CdrVsa, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
@@ -41,9 +40,6 @@ class SysLogImportMaster extends Actor {
 
     case SysLogImport(statsListener) => {
       sysLogMessageFetchWorker ! SysLogMessagesFetch(statsListener)
-//      val fetchFuture = sysLogMessageFetchWorker ? SysLogMessagesFetch mapTo manifest[List[(Long, String)]]
-//      fetchFuture map (_ map (msg => sysLogParseWorker ! SysLogParse(msg._2, statsListener)))
-//      Await.result(fetchFuture, 100 seconds)
     }
   }
 }

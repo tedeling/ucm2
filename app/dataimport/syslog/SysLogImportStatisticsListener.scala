@@ -3,7 +3,7 @@ package dataimport.syslog
 import akka.actor.Actor
 import org.joda.time.LocalDateTime
 
-class DataImportStatistics {
+class SysLogImportStatistics {
   private var cdr: Int = 0
   private var vsa: Int = 0
   private var dupes: Int = 0
@@ -41,11 +41,11 @@ class DataImportStatistics {
   def finished: Boolean = endTime.isDefined
 }
 
-class DataImportStatisticsListener extends Actor {
-  var stats:Option[DataImportStatistics] = None
+class SysLogImportStatisticsListener extends Actor {
+  var stats:Option[SysLogImportStatistics] = None
 
   override def receive = {
-    case ResetStatistics => stats = Some(new DataImportStatistics())
+    case ResetStatistics => stats = Some(new SysLogImportStatistics())
     case DuplicateMessage => stats.get.addDupe()
     case CdrMessage => stats.get.addCdr()
     case CdrVsaMessage => stats.get.addVsa()
@@ -54,11 +54,10 @@ class DataImportStatisticsListener extends Actor {
   }
 }
 
-sealed trait StatisticsMessage
-
-case object DuplicateMessage extends StatisticsMessage
-case object CdrVsaMessage extends StatisticsMessage
-case object CdrMessage extends StatisticsMessage
-case object ResetStatistics extends StatisticsMessage
-case object ProvideStatistics extends StatisticsMessage
-case class SessionSize(size: Int) extends StatisticsMessage
+sealed trait SysLogImportStatsMessage
+case object DuplicateMessage extends SysLogImportStatsMessage
+case object CdrVsaMessage extends SysLogImportStatsMessage
+case object CdrMessage extends SysLogImportStatsMessage
+case object ResetStatistics extends SysLogImportStatsMessage
+case object ProvideStatistics extends SysLogImportStatsMessage
+case class SessionSize(size: Int) extends SysLogImportStatsMessage

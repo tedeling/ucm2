@@ -25,6 +25,8 @@ object SysLogDao {
     }
   }
 
+
+
   def cdrExists(originalRecord: String)(implicit conn: Connection) = {
     val stmt = conn.prepareStatement( """SELECT ID FROM CDR WHERE ORIGINAL_RECORD = ?""")
     stmt.setString(1, originalRecord)
