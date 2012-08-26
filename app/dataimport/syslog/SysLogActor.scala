@@ -3,7 +3,7 @@ package dataimport.syslog
 
 import akka.actor.{ActorRef, Props, Actor}
 import dao.SysLogDao
-import dataimport.SysLogImport
+import dataimport.TriggerSysLogImport
 import parser.SysLogParser
 import play.api.Logger
 import akka.routing.RoundRobinRouter
@@ -11,26 +11,25 @@ import domain.{CdrVsa, Cdr}
 import play.api.db.DB
 import akka.util.Timeout
 import akka.util.duration._
-import akka.pattern.ask
-import akka.dispatch.Await
 
 class SysLogMessages(val statsListener: ActorRef)
 case class SysLogMessagesFetch(override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 case class SysLogMessagesPersistCdr(cdr: Cdr, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 case class SysLogMessagesPersistCdrVsa(cdrVsa: CdrVsa, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
-case class SysLogMessagesResult(sysLogEntries: List[(Long, String)], override val statsListener: ActorRef) extends SysLogMessages(statsListener)
+case class SysLogMessagesResult(sysLogEntries: List[(Long, String)])
 case class SysLogParse(rawSysLogEntry: String, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 
 class SysLogImportMaster extends Actor {
   val NrOfParsingActors = 4
 
+  val statsListener = context.actorOf(Props[SysLogImportStatisticsListener], name = "statisticsListener")
   val sysLogParseWorker = context.actorOf(Props[SysLogParseWorker].withRouter(RoundRobinRouter(NrOfParsingActors)), name = "sysLogParseRouter")
   val sysLogMessageFetchWorker = context.actorOf(Props[SysLogMessageFetchWorker], name = "sysLogDao")
 
   implicit val timeout = Timeout(100 seconds)
 
   protected def receive = {
-    case SysLogMessagesResult(sysLogEntries, statsListener) => {
+    case SysLogMessagesResult(sysLogEntries) => {
       val size = sysLogEntries.size
       statsListener ! SessionSize(size)
       Logger.info("Received %d syslog events".format(size))
@@ -38,7 +37,8 @@ class SysLogImportMaster extends Actor {
       sysLogEntries map (msg => sysLogParseWorker ! SysLogParse(msg._2, statsListener))
     }
 
-    case SysLogImport(statsListener) => {
+    case TriggerSysLogImport => {
+      statsListener ! ResetStatistics
       sysLogMessageFetchWorker ! SysLogMessagesFetch(statsListener)
     }
   }
@@ -101,7 +101,7 @@ class SysLogMessageFetchWorker extends Actor {
   protected def receive = {
     case SysLogMessagesFetch(listener) =>
       Logger.info("Fetching syslog dao")
-      sender ! SysLogMessagesResult(SysLogDao.findAfterId(0), listener)
+      sender ! SysLogMessagesResult(SysLogDao.findAfterId(0))
   }
 }
 
