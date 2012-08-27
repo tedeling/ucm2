@@ -1,4 +1,6 @@
-@(title: String)(content: Html)
+@(title: String, activePage: ActivePage)(content: Html)
+
+@import controllers.ActivePage
 
 <!DOCTYPE html>
 
@@ -42,16 +44,24 @@
             <a class="brand" href="#">UCM</a>
             <div class="nav-collapse">
                 <ul class="nav">
-                    <li class="active"><a href="#">Data Import Admin</a></li>
+                    <li @if(activePage.matches("reporting")) { class="active" }><a href="@controllers.report.routes.ReportController.index()">Reporting</a></li>
+                    <li @if(activePage.matches("importAdmin")) { class="active" }><a href="@controllers.dataimport.routes.ImportController.index()">Data Import Admin</a></li>
                 </ul>
-            </div><!--/.nav-collapse -->
+            </div>
         </div>
     </div>
 </div>
 
 <div class="container">
     @content
+
+    <br />
+    <footer>
+        <p>UCM Import, build 1</p>
+    </footer>
+
 </div>
+
 
 </body>
 </html>

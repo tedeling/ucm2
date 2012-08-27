@@ -1,0 +1,71 @@
+@main("Reporting", Reporting) {
+<div class="row">
+    <div class="span9">
+        <h2>Criteria</h2>
+
+        <div class="row">
+
+            <form class="form-horizontal">
+                <div class="span4">
+                    <div class="control-group">
+                        <label class="control-label" for="inputDate">Date</label>
+
+                        <div class="controls">
+                            <input type="text" id="inputDate" placeholder="date">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="resolution">Resolution</label>
+
+                        <div class="controls">
+                            <select type="text" id="resolution">
+                                <option value="HOUR">by hour</option>
+                                <option selected="selected" value="DAY">by day</option>
+                                <option value="WEEK">by week</option>
+                                <option value="MONTH">by month</option>
+                                <option value="YEAR">by year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="span4">
+                    <div class="control-group">
+                        <label class="control-label" for="huntgroup">Huntgroup</label>
+
+                        <div class="controls">
+                            <select type="text" id="huntgroup">
+                                <option selected="selected" value="">All huntgroups</option>
+                                <option value="0">Huntgroup #1</option>
+                                <option value="1">Huntgroup #2</option>
+                                <option value="2">Huntgroup #3</option>
+                                <option value="3">Huntgroup #4</option>
+                                <option value="4">Huntgroup #5</option>
+                                <option value="5">Huntgroup #6</option>
+                                <option value="6">Huntgroup #7</option>
+                                <option value="7">Huntgroup #8</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="type">Report type</label>
+
+                        <div class="controls">
+                            <select type="text" id="type">
+                                <option selected="selected" value="0">On huntgroup</option>
+                                <option value="1">By weekday</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="span9">
+        <h2></h2>
+    </div>
+}
