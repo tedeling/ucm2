@@ -14,7 +14,7 @@ class DataImportMaster(nrOfWorkers: Int) extends Actor {
   def receive = {
     case Status => statsListener.forward(ProvideStatistics)
 
-    case TriggerSysLogImport$ => {
+    case TriggerSysLogImport => {
       statsListener ! ResetStatistics
       sysLogRouter ! TriggerSysLogImport
       acdRouter ! TriggerAcdImport

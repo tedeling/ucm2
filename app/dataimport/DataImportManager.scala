@@ -23,7 +23,7 @@ object DataImportManager {
       case Some(status) => status.finished
       case None => true
     }) {
-      findOrCreateDataImport ! TriggerSysLogImport$
+      findOrCreateDataImport ! TriggerSysLogImport
       true
     } else {
       false
