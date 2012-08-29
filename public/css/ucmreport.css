@@ -1,0 +1,79 @@
+body {
+    color: #000000;
+    background-color: #f4f4f4;
+    font-family: verdana, arial, sans-serif;
+    font-size: small;
+    margin: 0;
+    padding: 0;
+}
+
+.sort_wrapper {
+    padding-right: 20px;
+    position: relative;
+}
+
+.datatable .sort_icon {
+    margin-top: -7px;
+    position: absolute;
+    right: 0;
+    top: 50%
+}
+
+.datatable {
+    border-collapse: collapse;
+    margin: 0 auto;
+    width: 100%;
+    font-size: 0.8em;
+}
+
+.datatable td {
+    padding: 1px 5px;
+}
+
+.datatable .newGroup {
+    border-left: 1px solid #D3D3D3;
+}
+
+.datatable .lastGroup {
+    border-right: 1px solid #D3D3D3;
+}
+
+
+.footer {
+    font-weight: normal;
+    padding: 5px;
+}
+
+#reportCriteria {
+    border-top: 0;
+    padding: 5px;
+}
+
+#reportCriteria div {
+    float: left;
+    width: 150px;
+}
+
+#reportCriteria fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+#reportCriteria ul {
+    margin: 0;
+    padding: 0;
+}
+
+#reportCriteria ul li {
+    cursor: pointer;
+    float: left;
+    list-style: none outside none;
+    margin: 2px;
+    padding: 4px 0;
+    position: relative;
+}
+
+.vert_space {
+    height: 1.3em;
+}
