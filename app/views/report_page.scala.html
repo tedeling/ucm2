@@ -1,10 +1,28 @@
-@main("Reporting", Reporting) {
-<div style="margin-left: auto;margin-right:auto;width: 1200px;margin-top: 1.3em;">
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Data Import administration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" href='@routes.Assets.at("css/ucmreport.css")'/>
+    <link rel="stylesheet" href='@routes.Assets.at("css/jquery-ui.css")' type="text/css" media="screen"/>
+    <script src='@routes.Assets.at("js/jquery.js")'></script>
+    <script src='@routes.Assets.at("js/jquery-ui.min.js")'></script>
+
+    <script src='@routes.Assets.at("/js/ucm-admin.js")'></script>
+
+
+</head>
+<body>
+
+
+
+<div class="report_container">
 
     <div class="ui-widget ui-widget-content ui-corner-all" style="padding: 0.2em">
 
-        <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"
-             style="color:white;padding: 0.2em 0 0.2em 0.2em;">
+        <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix title">
             <span>Report Criteria</span>
         </div>
 
@@ -53,4 +71,3 @@
 <div class="vert_space" style="clear:both;"></div>
 <div class="vert_space"></div>
 <div class="vert_space"></div>
-}
