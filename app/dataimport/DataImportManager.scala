@@ -14,7 +14,7 @@ object DataImportManager {
 
   def status(): Option[SysLogImportStatistics] = {
     implicit val timeout = Timeout(2 seconds)
-    val future = findOrCreateDataImport ? Status
+    val future = findOrCreateDataImport ? CollectStatistics
     Await.result(future, 2 seconds).asInstanceOf[Option[SysLogImportStatistics]]
   }
 

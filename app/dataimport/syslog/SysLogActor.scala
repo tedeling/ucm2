@@ -3,7 +3,7 @@ package dataimport.syslog
 
 import akka.actor.{ActorRef, Props, Actor}
 import dao.SysLogDao
-import dataimport.TriggerSysLogImport
+import dataimport.{CollectStatistics, TriggerSysLogImport}
 import parser.SysLogParser
 import play.api.Logger
 import akka.routing.RoundRobinRouter
@@ -22,7 +22,7 @@ case class SysLogParse(rawSysLogEntry: String, override val statsListener: Actor
 class SysLogImportMaster extends Actor {
   val NrOfParsingActors = 4
 
-  val statsListener = context.actorOf(Props[SysLogImportStatisticsListener], name = "statisticsListener")
+  val statsListener = context.actorOf(Props[SysLogImportStatisticsListener], name = "sysLogStatsListener")
   val sysLogParseWorker = context.actorOf(Props[SysLogParseWorker].withRouter(RoundRobinRouter(NrOfParsingActors)), name = "sysLogParseRouter")
   val sysLogMessageFetchWorker = context.actorOf(Props[SysLogMessageFetchWorker], name = "sysLogDao")
 
@@ -41,6 +41,8 @@ class SysLogImportMaster extends Actor {
       statsListener ! ResetStatistics
       sysLogMessageFetchWorker ! SysLogMessagesFetch(statsListener)
     }
+
+    case CollectStatistics => statsListener.forward(ProvideStatistics)
   }
 }
 
