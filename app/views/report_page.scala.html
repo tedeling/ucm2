@@ -6,68 +6,224 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" type="text/css" href='@routes.Assets.at("css/ucmreport.css")'/>
+    <link rel="stylesheet" type="text/css" href='@routes.Assets.at("css/jquery.dataTables.css")'/>
+    <link rel="stylesheet" type="text/css" href='@routes.Assets.at("css/jquery.dataTables_themeroller.css")'/>
     <link rel="stylesheet" href='@routes.Assets.at("css/jquery-ui.css")' type="text/css" media="screen"/>
     <script src='@routes.Assets.at("js/jquery.js")'></script>
     <script src='@routes.Assets.at("js/jquery-ui.min.js")'></script>
 
     <script src='@routes.Assets.at("/js/ucm-admin.js")'></script>
+    <script src='@routes.Assets.at("/js/jquery.dataTables.min.js")'></script>
 
+    <script>
+        $(document).ready(function() {
+            $('#datagrid').dataTable({
+                "bFilter": false,
+                "bLengthChange", false
+            });
+        });
 
+    </script>
 </head>
 <body>
 
 
-
 <div class="report_container">
 
-    <div class="ui-widget ui-widget-content ui-corner-all" style="padding: 0.2em">
+<div class="ui-widget ui-widget-content ui-corner-all" style="padding: 0.2em">
 
-        <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix title">
-            <span>Report Criteria</span>
-        </div>
+    <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix title">
+        <span>Report Criteria</span>
+    </div>
 
-        <div id="reportCriteria">
+    <div id="reportCriteria">
 
-            <div style="width: 600px;float:left;">
-                <div>
-                    Date:
-                </div>
-
-                <fieldset>
-                    <ul class="ui-widget ui-helper-clearfix">
-                        <li><span id="dateStart"></span></li>
-                        <li class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-calendar"/></li>
-                        <li style="cursor:auto; margin: 2px 1em 2px 1em">to</li>
-                        <li><span id="dateEnd"></span></li>
-                        <li class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-calendar"/></li>
-                    </ul>
-                </fieldset>
-
-                <div>Resolution:</div>
-
-                <fieldset>
-                    <select id="resolution">
-                        <option>by hour</option>
-                        <option>by day</option>
-                        <option>by week</option>
-                        <option>by month</option>
-                    </select>
-                </fieldset>                <br/>
-
-                <div>Huntgroup:</div>
-                <select id="huntGroupSelection"></select>
+        <div style="width: 600px;float:left;">
+            <div>
+                Date:
             </div>
 
-            Report type: <select id="reportTypeSelection"></select>
+            <fieldset>
+                <ul class="ui-widget ui-helper-clearfix">
+                    <li><span id="dateStart"></span></li>
+                    <li class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-calendar"/></li>
+                    <li style="cursor:auto; margin: 2px 1em 2px 1em">to</li>
+                    <li><span id="dateEnd"></span></li>
+                    <li class="ui-state-default ui-corner-all"><span class="ui-icon ui-icon-calendar"/></li>
+                </ul>
+            </fieldset>
+
+            <div>Resolution:</div>
+
+            <fieldset>
+                <select id="resolution">
+                    <option>by hour</option>
+                    <option>by day</option>
+                    <option>by week</option>
+                    <option>by month</option>
+                </select>
+            </fieldset>
+            <br/>
+
+            <div>Huntgroup:</div>
+            <select id="huntGroupSelection"></select>
         </div>
 
-        <div style="clear: both;"></div>
+        Report type: <select id="reportTypeSelection"></select>
     </div>
-    <div class="vert_space">&nbsp;</div>
 
-
+    <div style="clear: both;"></div>
 </div>
+<div class="vert_space">&nbsp;</div>
+
 
 <div class="vert_space" style="clear:both;"></div>
 <div class="vert_space"></div>
-<div class="vert_space"></div>
+<div class="ui-widget ui-widget-content ui-corner-all" style="padding: 0.2em">
+    <table class="datatable" cellpadding="0" cellspacing="0" id="datagrid">
+        <thead>
+
+
+        <tr>
+            <th class="ui-state-default"></th>
+            <th class="ui-state-default" colspan="2">Agents</th>
+            <th class="ui-state-default" colspan="2">Calls</th>
+            <th class="ui-state-default" colspan="2">Time to answer</th>
+            <th class="ui-state-default" colspan="2">Duration</th>
+            <th class="ui-state-default" colspan="2">On hold</th>
+            <th class="ui-state-default" colspan="2">Abandoned</th>
+            <th class="ui-state-default" colspan="3">Voicemail</th>
+        </tr>
+
+        <tr>
+            <th class="ui-state-default newGroup"><a href="#">
+                <div class="sort_wrapper">
+                    <span>Time</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default newGroup"><a href="#">
+                <div class="sort_wrapper">
+                    <span>Online</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default"><a href="#">
+                <div class="sort_wrapper">
+                    <span>Performance</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default newGroup"><a href="#">
+                <div class="sort_wrapper">
+                    <span>Presented</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default"><a href="#">
+                <div class="sort_wrapper">
+                    <span>Answered</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default newGroup"><a href="#">
+                <div class="sort_wrapper">
+                    <span>Avg</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default"><a
+                    href="#">
+                <div class="sort_wrapper">
+                    <span>Longest</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default newGroup"><a
+                    href="#">
+                <div class="sort_wrapper">
+                    <span>Avg</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default"><a href="#">
+                <div class="sort_wrapper">
+                    <span>Longest</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default newGroup"><a href="#">
+                <div class="sort_wrapper">
+                    <span>Avg</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default"><a
+                    href="#">
+                <div class="sort_wrapper">
+                    <span>Longest</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default newGroup"><a
+                    href="#">
+                <div class="sort_wrapper">
+                    <span>Total</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default"><a href="#">
+                <div class="sort_wrapper">
+                    <span>Avg</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default newGroup"><a href="#">
+                <div class="sort_wrapper">
+                    <span>New</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default"><a href="#">
+                <div class="sort_wrapper">
+                    <span>Answered</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+            <th class="ui-state-default lastGroup"><a href="#">
+                <div class="sort_wrapper">
+                    <span>Delta</span>
+                    <span class="ui-icon ui-icon-carat-2-n-s sort_icon"></span></div>
+            </a></th>
+
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr>
+            <td class="newGroup"> Tue 04 Aug 2012 </td>
+            <td class="newGroup">6</td>
+            <td>9</td>
+            <td class="newGroup"> 77 </td>
+            <td> 58 </td>
+            <td class="newGroup"> 4s </td>
+            <td> 139s </td>
+            <td class="newGroup"> 166s </td>
+            <td> 688s </td>
+            <td class="newGroup"> 15s </td>
+            <td> 155s </td>
+            <td class="newGroup"> 5 </td>
+            <td> 2s </td>
+            <td class="newGroup"> 17 </td>
+            <td> 14 </td>
+            <td class="lastGroup"> 3 </td>
+        </tr>
+        </tbody>
+
+    </table>
+</div>
+</div>
+
+
+</body>
+</html>

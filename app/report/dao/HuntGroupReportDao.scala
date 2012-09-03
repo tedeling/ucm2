@@ -6,8 +6,39 @@ import anorm._
 import anorm.SqlParser._
 import domain.{CdrVsa, Cdr}
 import java.sql.{Connection, Timestamp}
+import report.dao.dto.AgentStatisticsRow
 
 object HuntGroupReportDao {
+  def aggregateAgents() {
+    DB.withConnection {
+      implicit c =>
+        val stmt = c.prepareStatement( """
+          SELECT DATE_FORMAT(AGS.SUMMARY_TIME, 'YYYYMMDD') AS STIME,
+                MAX(AGS.SUMMARY_TIME) AS SUMMARY_TIME,
+                COUNT(DISTINCT AGS.AGENT_ID) AS ONLINE_AGENTS,
+                AVG(AGS.QUEUE_AVG_TIME_IN_CALL) AS AVG_TIME_IN_CALL,
+                MAX(AGS.QUEUE_LONGEST_TIME_IN_CALL) AS LONGEST_TIME_IN_CALL,
+                AVG(AGS.QUEUE_AVG_HOLD_TIME) AS AVG_HOLD_TIME,
+                MAX(AGS.QUEUE_LONGEST_HOLD_TIME) AS LONGEST_HOLD_TIME
+        FROM AGENT_SUMMARY AGS
+        GROUP BY STIME
+        ORDER BY SUMMARY_TIME""")
+
+        val query = stmt.executeQuery()
+
+        def findAll: Iterator[AgentStatisticsRow] = new Iterator[AgentStatisticsRow] {
+          val rs = query
+
+          override def hasNext = !rs.isLast
+
+          override def next() = {
+            new AgentStatisticsRow()
+            new valueFromResultSet(rs.next)
+          }
+        }
+    }
+  }
+
   def findAfterId(id: Long): List[(Long, String)] = {
     DB.withConnection {
       implicit c =>
@@ -24,7 +55,6 @@ object HuntGroupReportDao {
           .map(flatten)
     }
   }
-
 
 
   def cdrExists(originalRecord: String)(implicit conn: Connection) = {
