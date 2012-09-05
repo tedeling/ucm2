@@ -15,7 +15,7 @@ class SysLogMessages(val statsListener: ActorRef)
 case class SysLogMessagesFetch(override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 case class SysLogMessagesPersistCdr(cdr: Cdr, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 case class SysLogMessagesPersistCdrVsa(cdrVsa: CdrVsa, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
-case class SysLogMessagesResult(sysLogEntries: List[(Long, String)])
+case class SysLogMessagesResult(sysLogEntries: Traversable[(Long, String)])
 case class SysLogParse(rawSysLogEntry: String, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 
 class SysLogImportMaster extends Actor {

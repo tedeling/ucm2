@@ -12,8 +12,8 @@ class HuntGroupReportDaoSpec extends Specification {
     "aggregate agents" in {
       runInServer {
         val agents = HuntGroupReportDao.aggregateAgents()
-
-        agents.map(agent => println(agent.avgHoldTime))
+        
+//        agents.map(agent => println(agent.avgHoldTime))
         1 == 1
       }
     }
