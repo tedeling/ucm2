@@ -1,13 +1,12 @@
 package dataimport.syslog
 
-
-import akka.actor.{ActorRef, Props, Actor}
+import akka.actor.{ ActorRef, Props, Actor }
 import dao.SysLogDao
-import dataimport.{CollectStatistics, TriggerSysLogImport}
+import dataimport.{ CollectStatistics, TriggerSysLogImport }
 import parser.SysLogParser
 import play.api.Logger
 import akka.routing.RoundRobinRouter
-import domain.{CdrVsa, Cdr}
+import domain.{ CdrVsa, Cdr }
 import play.api.db.DB
 import akka.util.Timeout
 import akka.util.duration._
@@ -46,7 +45,6 @@ class SysLogImportMaster extends Actor {
   }
 }
 
-
 class SysLogParseWorker extends Actor {
   val persistRouter = context.actorOf(Props[SysLogMessagePersistWorker].withRouter(RoundRobinRouter(4)), name = "sysLogPersistRouter")
 
@@ -74,27 +72,29 @@ class SysLogMessagePersistWorker extends Actor {
 
   def persistVsa(vsa: CdrVsa, statsListener: ActorRef) {
     DB.withConnection {
-      implicit c => {
-        if (SysLogDao.vsaExists(vsa.originalRecord)) {
-          statsListener ! DuplicateMessage
-        } else {
-          SysLogDao.persistCdrVsa(vsa)
-          statsListener ! CdrVsaMessage
+      implicit c =>
+        {
+          if (SysLogDao.vsaExists(vsa.originalRecord)) {
+            statsListener ! DuplicateMessage
+          } else {
+            SysLogDao.persistCdrVsa(vsa)
+            statsListener ! CdrVsaMessage
+          }
         }
-      }
     }
   }
 
   def persistCdr(cdr: Cdr, statsListener: ActorRef) {
     DB.withConnection {
-      implicit c => {
-        if (SysLogDao.cdrExists(cdr.originalRecord)) {
-          statsListener ! DuplicateMessage
-        } else {
-          SysLogDao.persistCdr(cdr)
-          statsListener ! CdrMessage
+      implicit c =>
+        {
+          if (SysLogDao.cdrExists(cdr.originalRecord)) {
+            statsListener ! DuplicateMessage
+          } else {
+            SysLogDao.persistCdr(cdr)
+            statsListener ! CdrMessage
+          }
         }
-      }
     }
   }
 }
@@ -103,7 +103,17 @@ class SysLogMessageFetchWorker extends Actor {
   protected def receive = {
     case SysLogMessagesFetch(listener) =>
       Logger.info("Fetching syslog dao")
-      sender ! SysLogMessagesResult(SysLogDao.findAfterId(0))
+      sender ! SysLogMessagesResult(findResults())
+
+  }
+
+  def findResults(): List[(Long, String)] = {
+    import play.api.Play.current
+
+    DB.withConnection {
+      implicit c =>
+          SysLogDao.findAfterId(0)
+    }
   }
 }
 

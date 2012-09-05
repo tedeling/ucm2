@@ -4,37 +4,35 @@ import play.api.db._
 import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
-import domain.{CdrVsa, Cdr}
-import java.sql.{Connection, Timestamp}
+import domain.{ CdrVsa, Cdr }
+import java.sql.{ Connection, Timestamp }
 
 object SysLogDao {
-  def findAfterId(id: Long): List[(Long, String)] = {
-    DB.withConnection {
-      implicit c =>
-        val query = """SELECT ID, Message
+  def findAfterId(id: Long)(implicit conn: Connection): List[(Long, String)] = {
+    val stmt = conn.prepareStatement("""SELECT ID, Message
                       FROM SystemEvents
-                      WHERE ID >= {id} AND ID <= 20000
+                      WHERE ID >= {id} AND ID <= 250000
                       AND Priority = 5
                       AND Facility = 5
-                    """
+                    """)
 
-        SQL(query)
-          .on('id -> id)
-          .as(long("ID") ~ str("Message") *)
-          .map(flatten)
-    }
+    List()
+
+    //          
+    //        SQL(query)
+    //          .on('id -> id)
+    //          .as(long("ID") ~ str("Message") *)
+    //          .map(flatten)
   }
 
-
-
   def cdrExists(originalRecord: String)(implicit conn: Connection) = {
-    val stmt = conn.prepareStatement( """SELECT ID FROM CDR WHERE ORIGINAL_RECORD = ?""")
+    val stmt = conn.prepareStatement("""SELECT ID FROM CDR WHERE ORIGINAL_RECORD = ?""")
     stmt.setString(1, originalRecord)
     stmt.executeQuery().next()
   }
 
   def persistCdr(cdr: Cdr)(implicit conn: Connection) {
-    val stmt = conn.prepareStatement( """INSERT INTO CDR (CALL_LEG_TYPE, CONNECTION_ID, SETUP_TIME,
+    val stmt = conn.prepareStatement("""INSERT INTO CDR (CALL_LEG_TYPE, CONNECTION_ID, SETUP_TIME,
                                                       PEER_ADDRESS, PEER_SUB_ADDRESS,
                                                       DISCONNECT_CAUSE, DISCONNECT_TEXT,
                                                       CONNECT_TIME, DISCONNECT_TIME,
@@ -43,7 +41,6 @@ object SysLogDao {
                                                       RECEIVED_PACKETS, RECEIVED_BYTES,
                                                       ORIGINAL_RECORD)
                                                       VALUES (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""")
-
 
     stmt.setInt(1, cdr.callLegType)
     stmt.setString(2, cdr.connectionId)
@@ -67,19 +64,18 @@ object SysLogDao {
   }
 
   def vsaExists(originalRecord: String)(implicit conn: Connection) = {
-    val stmt = conn.prepareStatement( """SELECT ID FROM CDR_VSA WHERE ORIGINAL_RECORD = ?""")
+    val stmt = conn.prepareStatement("""SELECT ID FROM CDR_VSA WHERE ORIGINAL_RECORD = ?""")
     stmt.setString(1, originalRecord)
     stmt.executeQuery().next()
   }
 
   def persistCdrVsa(vsa: CdrVsa)(implicit conn: Connection) {
-    val stmt = conn.prepareStatement( """INSERT INTO CDR_VSA (FEATURE_ID, CONNECTION_ID,
+    val stmt = conn.prepareStatement("""INSERT INTO CDR_VSA (FEATURE_ID, CONNECTION_ID,
                                            FEATURE_NAME, FWD_FROM_NUMBER, STATUS, FEATURE_TIME,
                                            FWD_REASON, FWD_NUMBER, FWD_SRC_NUMBER, FWD_TO_NUMBER,
                                            CALLED_NUMBER, CALLING_NUMBER,
                                            LEG_ID, ORIGINAL_RECORD)
                                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""")
-
 
     stmt.setLong(1, vsa.featureId)
     stmt.setString(2, vsa.connectionId)

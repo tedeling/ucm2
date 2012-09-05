@@ -1,4 +1,4 @@
-package report.dao.dto
+package report.dto
 
 import org.joda.time.DateTime
 
