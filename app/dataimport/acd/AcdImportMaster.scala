@@ -3,7 +3,7 @@ package dataimport.acd
 import akka.actor.{Props, Actor}
 import akka.routing.RoundRobinRouter
 import akka.util.Timeout
-import dataimport.syslog.SessionSize
+import dataimport.syslog.RecordFound
 import play.api.Logger
 import dataimport.TriggerSysLogImport
 

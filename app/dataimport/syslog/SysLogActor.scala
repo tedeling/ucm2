@@ -15,27 +15,15 @@ class SysLogMessages(val statsListener: ActorRef)
 case class SysLogMessagesFetch(override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 case class SysLogMessagesPersistCdr(cdr: Cdr, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 case class SysLogMessagesPersistCdrVsa(cdrVsa: CdrVsa, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
-case class SysLogMessagesResult(sysLogEntries: Traversable[(Long, String)])
 case class SysLogParse(rawSysLogEntry: String, override val statsListener: ActorRef) extends SysLogMessages(statsListener)
 
 class SysLogImportMaster extends Actor {
-  val NrOfParsingActors = 4
-
   val statsListener = context.actorOf(Props[SysLogImportStatisticsListener], name = "sysLogStatsListener")
-  val sysLogParseWorker = context.actorOf(Props[SysLogParseWorker].withRouter(RoundRobinRouter(NrOfParsingActors)), name = "sysLogParseRouter")
   val sysLogMessageFetchWorker = context.actorOf(Props[SysLogMessageFetchWorker], name = "sysLogDao")
 
   implicit val timeout = Timeout(100 seconds)
 
   protected def receive = {
-    case SysLogMessagesResult(sysLogEntries) => {
-      val size = sysLogEntries.size
-      statsListener ! SessionSize(size)
-      Logger.info("Received %d syslog events".format(size))
-
-      sysLogEntries map (msg => sysLogParseWorker ! SysLogParse(msg._2, statsListener))
-    }
-
     case TriggerSysLogImport => {
       statsListener ! ResetStatistics
       sysLogMessageFetchWorker ! SysLogMessagesFetch(statsListener)
@@ -100,19 +88,29 @@ class SysLogMessagePersistWorker extends Actor {
 }
 
 class SysLogMessageFetchWorker extends Actor {
+  val NrOfParsingActors = 4
+
+  val sysLogParseRouter = context.actorOf(Props[SysLogParseWorker].withRouter(RoundRobinRouter(NrOfParsingActors)), name = "sysLogParseRouter")
+
   protected def receive = {
     case SysLogMessagesFetch(listener) =>
+
       Logger.info("Fetching syslog dao")
-      sender ! SysLogMessagesResult(findResults())
+      findResults(listener)
 
   }
 
-  def findResults(): List[(Long, String)] = {
+  def findResults(statsListener: ActorRef): Unit = {
     import play.api.Play.current
+
+    val messageSender = (id: Long, message: String) => {
+      sysLogParseRouter ! SysLogParse(message, statsListener)
+      statsListener ! RecordFound(1)
+    }
 
     DB.withConnection {
       implicit c =>
-          SysLogDao.findAfterId(0)
+        SysLogDao.findAfterId(0, messageSender)
     }
   }
 }

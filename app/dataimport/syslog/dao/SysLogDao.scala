@@ -9,15 +9,18 @@ import java.sql.{ Connection, Timestamp }
 import util.DbUtil
 
 object SysLogDao {
-  def findAfterId(id: Long)(implicit conn: Connection): List[(Long, String)] = {
+  def findAfterId(id: Long, f: (Long, String) => Unit)(implicit conn: Connection) = {
     val stmt = conn.prepareStatement("""SELECT ID, Message
                       FROM SystemEvents
                       WHERE ID >= 0 AND ID <= 250000
                       AND Priority = 5
                       AND Facility = 5
                     """)
-
-    DbUtil.parseResultSet(stmt.executeQuery(), rs => (rs.getLong("ID"), rs.getString("Message")))
+    val rs = stmt.executeQuery()
+    
+    while (rs.next()) {
+      f(rs.getLong("ID"), rs.getString("Message"))
+    }
   }
 
   def cdrExists(originalRecord: String)(implicit conn: Connection) = {

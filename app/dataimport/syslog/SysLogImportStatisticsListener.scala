@@ -16,6 +16,16 @@ class SysLogImportStatistics {
   def dupeCount = dupes
   def start = startTime
   def end = endTime
+  def rowsFound = size
+  def recordsPerSecond = {
+   val sessionLength= (new LocalDateTime().toDate().getTime() - startTime.toDate().getTime()) / 1000
+   
+   if (sessionLength != 0) {
+	   (cdr + vsa + dupes) / sessionLength
+   } else {
+     0
+   }
+  }
 
   def addDupe() {
     dupes = dupes + 1
@@ -42,7 +52,7 @@ class SysLogImportStatistics {
 }
 
 class SysLogImportStatisticsListener extends Actor {
-  var stats:Option[SysLogImportStatistics] = None
+  var stats: Option[SysLogImportStatistics] = None
 
   override def receive = {
     case ResetStatistics => stats = Some(new SysLogImportStatistics())
@@ -50,7 +60,7 @@ class SysLogImportStatisticsListener extends Actor {
     case CdrMessage => stats.get.addCdr()
     case CdrVsaMessage => stats.get.addVsa()
     case ProvideStatistics => sender ! stats
-    case SessionSize(size) => stats.get.size = size
+    case RecordFound(size) => stats.get.size = stats.get.size + size
   }
 }
 
@@ -60,4 +70,4 @@ case object CdrVsaMessage extends SysLogImportStatsMessage
 case object CdrMessage extends SysLogImportStatsMessage
 case object ResetStatistics extends SysLogImportStatsMessage
 case object ProvideStatistics extends SysLogImportStatsMessage
-case class SessionSize(size: Int) extends SysLogImportStatsMessage
+case class RecordFound(size: Int) extends SysLogImportStatsMessage

@@ -32,7 +32,9 @@ object ImportController extends Controller {
             }),
             "cdr" -> status.cdrCount.toString,
             "vsa" -> status.vsaCount.toString,
-            "dupes" -> status.dupeCount.toString))
+            "dupes" -> status.dupeCount.toString,
+            "rowsFound" -> status.rowsFound.toString,
+            "rps" -> status.recordsPerSecond.toString))
         )
         case None => NoContent
       }
