@@ -1,4 +1,4 @@
-package dataimport.syslog.dao
+package report.dao
 
 import play.api.db._
 import play.api.Play.current
